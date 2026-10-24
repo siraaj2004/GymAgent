@@ -16,6 +16,12 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s /Applications/Xcode_16.3.app || sudo xcode-select -s /Applications/Xcode_16.2.app || sudo xcode-select -s /Applications/Xcode.app
       - name: Install XcodeGen
         run: brew install xcodegen
+      - name: Generate human-like Telugu voice clips (best effort)
+        # Shruti neural clips are generated on the runner, where speech.platform.bing.com
+        # is reachable. This sandbox blocks that endpoint (SSL error), so clips are NOT
+        # generated here. If this step fails, the build continues and VoiceCoach falls
+        # back to AVSpeech te-IN on the phone.
+        run: python3 -m pip install edge-tts && python3 scripts/generate_telugu_voice.py || echo "Telugu clips unavailable — AVSpeech fallback will be used"
       - name: Generate Xcode project
         run: xcodegen generate
       - name: Run tests
