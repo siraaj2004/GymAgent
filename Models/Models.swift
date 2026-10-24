@@ -62,6 +62,8 @@ final class FoodEntry {
     var fat: Double = 0
     var fibre: Double = 0
     var date: Date = Date()
+    /// Optional photo taken / chosen when logging by photo. Nil for search-only entries.
+    var photoData: Data?
     init() {}
 }
 
