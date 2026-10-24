@@ -80,6 +80,12 @@ struct HomeView: View {
                             .foregroundColor(GymTheme.secondaryText)
                     }
                 }
+                GymCard {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Stuck anywhere?").font(.headline)
+                        Text("Tap Help at the bottom of the screen, type the problem in your own words, and the app will give you fix steps right away.")
+                    }
+                }
             }.padding()
         }.background(GymTheme.background)
         }
