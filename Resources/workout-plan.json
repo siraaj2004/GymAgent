@@ -1,1 +1,874 @@
-{"days":[{"day":1,"exercises":[{"effort":"1-2 RIR","muscles":"Pectoralis major (upper emphasis), anterior deltoid, triceps","name":"Incline barbell or DB press","reps":"6-8","rest":"2-3 min","sets":4},{"effort":"1-2 RIR","muscles":"Pectoralis major","name":"Flat DB press","reps":"8-10","rest":"2 min","sets":3},{"effort":"0-2 RIR","muscles":"Pectoralis major; controlled stretch","name":"Cable fly","reps":"12-15","rest":"60-90 sec","sets":3},{"effort":"1-2 RIR","muscles":"Serratus anterior + chest","name":"Push-up plus","reps":"12-20","rest":"60 sec","sets":2},{"effort":"1-2 RIR","muscles":"Latissimus dorsi, teres major, biceps","name":"Pull-up / assisted pull-up","reps":"6-10","rest":"2-3 min","sets":4},{"effort":"1-2 RIR","muscles":"Rhomboids, middle traps, lats","name":"Chest-supported row","reps":"8-10","rest":"2 min","sets":4},{"effort":"1-2 RIR","muscles":"Latissimus dorsi, teres major","name":"1-arm lat pulldown","reps":"10-12","rest":"75-90 sec","sets":3},{"effort":"1-2 RIR","muscles":"Rear deltoid, traps, rotator cuff","name":"Face pull","reps":"12-15","rest":"60-90 sec","sets":3},{"effort":"2 RIR","muscles":"Erector spinae, glutes","name":"Back extension","reps":"12-15","rest":"60-90 sec","sets":2},{"effort":"1-2 RIR","muscles":"Anterior + lateral deltoid","name":"Seated DB shoulder press","reps":"6-10","rest":"2 min","sets":3},{"effort":"0-2 RIR","muscles":"Lateral deltoid","name":"Cable lateral raise","reps":"12-15","rest":"60 sec","sets":3},{"effort":"0-2 RIR","muscles":"Posterior deltoid, upper back","name":"Reverse pec deck","reps":"12-15","rest":"60 sec","sets":3},{"effort":"2 RIR","muscles":"Rotator cuff","name":"Cable/band external rotation","reps":"15-20","rest":"45-60 sec","sets":2}],"focus":"Heavy strength + stable hypertrophy work. Chest, lats, upper/mid back, all deltoid heads, rotator cuff.","title":"Chest + Back + Shoulders A","weekday":"Monday"},{"day":2,"exercises":[{"effort":"1-2 RIR","muscles":"Quadriceps, gluteals, adductors","name":"Back squat / hack squat","reps":"6-8","rest":"2-3 min","sets":4},{"effort":"1-2 RIR","muscles":"Quadriceps, gluteals","name":"Leg press","reps":"10-12","rest":"2 min","sets":3},{"effort":"1-2 RIR","muscles":"Quads, glutes, adductors","name":"Bulgarian split squat","reps":"8-10/leg","rest":"90-120 sec","sets":3},{"effort":"0-2 RIR","muscles":"Quadriceps","name":"Leg extension","reps":"12-15","rest":"60-90 sec","sets":3},{"effort":"1-2 RIR","muscles":"Hamstrings, glutes, erector spinae","name":"Romanian deadlift","reps":"6-8","rest":"2-3 min","sets":4},{"effort":"1-2 RIR","muscles":"Hamstrings","name":"Seated / lying leg curl","reps":"10-12","rest":"90 sec","sets":3},{"effort":"1-2 RIR","muscles":"Gluteals","name":"Hip thrust","reps":"8-12","rest":"90-120 sec","sets":3},{"effort":"0-2 RIR","muscles":"Adductors","name":"Adductor machine","reps":"12-15","rest":"60 sec","sets":2},{"effort":"0-2 RIR","muscles":"Abductors / glute medius region","name":"Abductor machine","reps":"12-15","rest":"60 sec","sets":2},{"effort":"0-2 RIR","muscles":"Gastrocnemius / calves","name":"Standing calf raise","reps":"10-15","rest":"60-90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Tibialis anterior","name":"Tibialis raises","reps":"15-20","rest":"45-60 sec","sets":2},{"effort":"1-2 RIR","muscles":"Biceps long head emphasis","name":"Incline DB curl","reps":"8-10","rest":"75-90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Brachialis + brachioradialis","name":"Hammer curl","reps":"10-12","rest":"60-75 sec","sets":2},{"effort":"1-2 RIR","muscles":"Triceps long head","name":"Overhead cable extension","reps":"10-12","rest":"75-90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Triceps lateral + medial heads","name":"Rope pushdown","reps":"12-15","rest":"60-75 sec","sets":2}],"focus":"Lower-body strength + full arm coverage.","title":"Legs + Biceps + Triceps A","weekday":"Tuesday"},{"day":3,"exercises":[{"effort":"1-2 RIR","muscles":"Lats, teres major, biceps, forearms","name":"Pull-up","reps":"6-10","rest":"2-3 min","sets":4},{"effort":"1-2 RIR","muscles":"Lats, biceps, brachialis","name":"Neutral-grip pull-up","reps":"6-10","rest":"2 min","sets":3},{"effort":"0-2 RIR","muscles":"Rectus abdominis","name":"Cable crunch","reps":"10-15","rest":"60-75 sec","sets":3},{"effort":"1-2 RIR","muscles":"Rectus abdominis + hip flexors","name":"Hanging knee/leg raise","reps":"8-12","rest":"60-90 sec","sets":3},{"effort":"1-2 RIR","muscles":"Transverse abdominis / obliques","name":"Pallof press","reps":"10-12/side","rest":"60 sec","sets":3},{"effort":"Controlled","muscles":"Internal/external oblique, QL","name":"Side plank","reps":"30-45 sec/side","rest":"45-60 sec","sets":3},{"effort":"1-2 RIR","muscles":"Transverse abdominis, rectus abdominis","name":"Ab wheel / body saw","reps":"6-12","rest":"60-90 sec","sets":2},{"effort":"0-2 RIR","muscles":"Forearm flexors","name":"Wrist curl","reps":"12-15","rest":"60 sec","sets":2},{"effort":"0-2 RIR","muscles":"Forearm extensors","name":"Reverse wrist curl","reps":"12-15","rest":"60 sec","sets":2},{"effort":"1-2 RIR","muscles":"Pronator teres + supinator","name":"Cable/band pronation + supination","reps":"12-15 each","rest":"45-60 sec","sets":2},{"effort":"Easy","muscles":"Deep neck flexors + posterior neck","name":"Neck isometric flexion/extension","note":"Very light and controlled. No aggressive automated correction. Stop immediately for pain, dizziness, numbness or unusual symptoms. Do not use rapid neck circles or heavy weighted neck flexion.","reps":"10-15 sec each","rest":"45-60 sec","sets":2},{"effort":"Easy","muscles":"SCM + lateral neck stabilizers","name":"Neck lateral isometric","note":"Very light and controlled. No aggressive automated correction. Stop immediately for pain, dizziness, numbness or unusual symptoms.","reps":"10-15 sec/side","rest":"45-60 sec","sets":2},{"effort":"Final set failure","muscles":"Chest, triceps, anterior deltoid","name":"Push-ups","reps":"8-20 + final set to technical failure","rest":"75 sec","sets":2}],"focus":"Accessory/anatomy day; controlled fatigue. Do not turn every movement into maximal failure.","title":"Abs + Pull-ups + Forearms + Neck + Push-ups","weekday":"Wednesday"},{"day":4,"exercises":[{"effort":"1-2 RIR","muscles":"Pectoralis major","name":"Machine or DB chest press","reps":"8-12","rest":"2 min","sets":4},{"effort":"1-2 RIR","muscles":"Pectoralis major, anterior deltoid","name":"Low-incline DB press","reps":"8-12","rest":"90-120 sec","sets":3},{"effort":"0-2 RIR","muscles":"Pectoralis major; shortened position","name":"High-to-low cable fly","reps":"12-15","rest":"60-75 sec","sets":3},{"effort":"1-2 RIR","muscles":"Serratus anterior","name":"Cable serratus punch","reps":"12-15/side","rest":"45-60 sec","sets":2},{"effort":"1-2 RIR","muscles":"Latissimus dorsi, teres major","name":"Lat pulldown","reps":"8-12","rest":"2 min","sets":4},{"effort":"1-2 RIR","muscles":"Rhomboids, middle traps, lats","name":"Seated cable row","reps":"8-12","rest":"90-120 sec","sets":3},{"effort":"1-2 RIR","muscles":"Latissimus dorsi, teres major","name":"1-arm DB row","reps":"10-12/side","rest":"90 sec","sets":3},{"effort":"1-2 RIR","muscles":"Upper trapezius","name":"Shrug","reps":"10-15","rest":"75-90 sec","sets":3},{"effort":"2 RIR","muscles":"Erector spinae + glutes","name":"Back extension / reverse hyper","reps":"12-15","rest":"60-90 sec","sets":2},{"effort":"1-2 RIR","muscles":"Anterior + lateral deltoid","name":"Landmine press","reps":"8-12","rest":"90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Lateral deltoid","name":"Lean-away lateral raise","reps":"12-15","rest":"60 sec","sets":4},{"effort":"0-2 RIR","muscles":"Posterior deltoid","name":"Cable rear-delt fly","reps":"12-15","rest":"60 sec","sets":3},{"effort":"2 RIR","muscles":"Rotator cuff","name":"External rotation","note":"Keep the exercise order but use a slightly lighter load than Day 1 and focus on range of motion.","reps":"15-20","rest":"45-60 sec","sets":2}],"focus":"Different angles + higher-rep hypertrophy. Second weekly exposure.","title":"Chest + Back + Shoulders B","weekday":"Thursday"},{"day":5,"exercises":[{"effort":"1-2 RIR","muscles":"Quadriceps, gluteals, adductors","name":"Front squat / hack squat","reps":"8-10","rest":"2 min","sets":3},{"effort":"1-2 RIR","muscles":"Quads, glutes, adductors, abductors","name":"Walking lunge","reps":"10-12/leg","rest":"90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Quadriceps","name":"Leg extension","reps":"12-15","rest":"60-75 sec","sets":3},{"effort":"1-2 RIR","muscles":"Hamstrings, glutes, erector spinae","name":"Romanian deadlift / good morning","reps":"8-10","rest":"2 min","sets":3},{"effort":"0-2 RIR","muscles":"Hamstrings","name":"Lying leg curl","reps":"10-15","rest":"75-90 sec","sets":3},{"effort":"1-2 RIR","muscles":"Gluteals","name":"Hip thrust / glute bridge","reps":"10-12","rest":"90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Soleus / calves","name":"Seated calf raise","reps":"12-15","rest":"60 sec","sets":3},{"effort":"0-2 RIR","muscles":"Tibialis anterior","name":"Tibialis raises","reps":"15-20","rest":"45-60 sec","sets":2},{"effort":"0-2 RIR","muscles":"Adductors","name":"Cable hip adduction","reps":"12-15","rest":"60 sec","sets":2},{"effort":"0-2 RIR","muscles":"Abductors / glute medius region","name":"Cable hip abduction","reps":"12-15","rest":"60 sec","sets":2},{"effort":"1-2 RIR","muscles":"Biceps short-head bias","name":"Preacher curl","reps":"8-12","rest":"75-90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Brachioradialis + forearms","name":"Reverse curl","reps":"10-12","rest":"60-75 sec","sets":2},{"effort":"1-2 RIR","muscles":"Triceps lateral/medial + chest","name":"Close-grip bench press","reps":"6-10","rest":"2 min","sets":3},{"effort":"0-2 RIR","muscles":"Triceps long head","name":"Cable overhead extension","reps":"10-12","rest":"75-90 sec","sets":3},{"effort":"0-2 RIR","muscles":"Triceps lateral + medial heads","name":"Rope pushdown","reps":"12-15","rest":"60 sec","sets":2},{"effort":"0-2 RIR","muscles":"Rectus abdominis","name":"Reverse crunch","reps":"12-15","rest":"45-60 sec","sets":2},{"effort":"Controlled","muscles":"Transverse abdominis / core control","name":"Dead bug","reps":"8-12/side","rest":"45-60 sec","sets":2}],"focus":"Second weekly lower/arm exposure + core.","title":"Legs + Biceps + Triceps B + Abs","weekday":"Friday"}],"progression":"When you reach the top of the rep range for every set with clean form, add the smallest practical weight next session.","restDays":[{"day":6,"note":"Walking, mobility, recovery.","title":"Rest and recovery","weekday":"Saturday"},{"day":7,"note":"Full recovery / optional easy walking. Focus on sleep, nutrition and hydration.","title":"Rest and recovery","weekday":"Sunday"}],"rule":"Most compound sets at 1-2 RIR. True failure mainly for safer bodyweight/isolation work, such as the final push-up set. Do not take heavy squats, presses, deadlifts, or neck work to failure. Neck work: very light and controlled. Stop immediately for pain, dizziness, numbness or unusual symptoms.","sessionMinutes":100,"source":"5_Day_100_Min_Gym_Anatomy_Workout_Plan__2.pdf — transcribed exactly; do not edit this bundled file. User edits are stored separately and this file is the restore source."}
+{
+  "days": [
+    {
+      "day": 1,
+      "exercises": [
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Pectoralis major (upper emphasis), anterior deltoid, triceps",
+          "name": "Incline barbell or DB press",
+          "reps": "6-8",
+          "rest": "2-3 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Pectoralis major",
+          "name": "Flat DB press",
+          "reps": "8-10",
+          "rest": "2 min",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Pectoralis major; controlled stretch",
+          "name": "Cable fly",
+          "reps": "12-15",
+          "rest": "60-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Serratus anterior + chest",
+          "name": "Push-up plus",
+          "reps": "12-20",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Latissimus dorsi, teres major, biceps",
+          "name": "Pull-up / assisted pull-up",
+          "reps": "6-10",
+          "rest": "2-3 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Rhomboids, middle traps, lats",
+          "name": "Chest-supported row",
+          "reps": "8-10",
+          "rest": "2 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Latissimus dorsi, teres major",
+          "name": "1-arm lat pulldown",
+          "reps": "10-12",
+          "rest": "75-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Rear deltoid, traps, rotator cuff",
+          "name": "Face pull",
+          "reps": "12-15",
+          "rest": "60-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "2 RIR",
+          "muscles": "Erector spinae, glutes",
+          "name": "Back extension",
+          "reps": "12-15",
+          "rest": "60-90 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Anterior + lateral deltoid",
+          "name": "Seated DB shoulder press",
+          "reps": "6-10",
+          "rest": "2 min",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Lateral deltoid",
+          "name": "Cable lateral raise",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Posterior deltoid, upper back",
+          "name": "Reverse pec deck",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 3
+        },
+        {
+          "effort": "2 RIR",
+          "muscles": "Rotator cuff",
+          "name": "Cable/band external rotation",
+          "reps": "15-20",
+          "rest": "45-60 sec",
+          "sets": 2
+        }
+      ],
+      "focus": "Heavy strength + stable hypertrophy work. Chest, lats, upper/mid back, all deltoid heads, rotator cuff.",
+      "title": "Chest + Back + Shoulders A",
+      "weekday": "Monday",
+      "blocks": [
+        {
+          "title": "Warm-up",
+          "minutes": 10,
+          "exercises": []
+        },
+        {
+          "title": "Chest",
+          "minutes": 25,
+          "exercises": [
+            "Incline barbell or DB press",
+            "Flat DB press",
+            "Cable fly",
+            "Push-up plus"
+          ]
+        },
+        {
+          "title": "Back",
+          "minutes": 30,
+          "exercises": [
+            "Pull-up / assisted pull-up",
+            "Chest-supported row",
+            "1-arm lat pulldown",
+            "Face pull",
+            "Back extension"
+          ]
+        },
+        {
+          "title": "Shoulders",
+          "minutes": 25,
+          "exercises": [
+            "Seated DB shoulder press",
+            "Cable lateral raise",
+            "Reverse pec deck",
+            "Cable/band external rotation"
+          ]
+        },
+        {
+          "title": "Cool-down",
+          "minutes": 10,
+          "exercises": []
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "exercises": [
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Quadriceps, gluteals, adductors",
+          "name": "Back squat / hack squat",
+          "reps": "6-8",
+          "rest": "2-3 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Quadriceps, gluteals",
+          "name": "Leg press",
+          "reps": "10-12",
+          "rest": "2 min",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Quads, glutes, adductors",
+          "name": "Bulgarian split squat",
+          "reps": "8-10/leg",
+          "rest": "90-120 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Quadriceps",
+          "name": "Leg extension",
+          "reps": "12-15",
+          "rest": "60-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Hamstrings, glutes, erector spinae",
+          "name": "Romanian deadlift",
+          "reps": "6-8",
+          "rest": "2-3 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Hamstrings",
+          "name": "Seated / lying leg curl",
+          "reps": "10-12",
+          "rest": "90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Gluteals",
+          "name": "Hip thrust",
+          "reps": "8-12",
+          "rest": "90-120 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Adductors",
+          "name": "Adductor machine",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Abductors / glute medius region",
+          "name": "Abductor machine",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Gastrocnemius / calves",
+          "name": "Standing calf raise",
+          "reps": "10-15",
+          "rest": "60-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Tibialis anterior",
+          "name": "Tibialis raises",
+          "reps": "15-20",
+          "rest": "45-60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Biceps long head emphasis",
+          "name": "Incline DB curl",
+          "reps": "8-10",
+          "rest": "75-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Brachialis + brachioradialis",
+          "name": "Hammer curl",
+          "reps": "10-12",
+          "rest": "60-75 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Triceps long head",
+          "name": "Overhead cable extension",
+          "reps": "10-12",
+          "rest": "75-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Triceps lateral + medial heads",
+          "name": "Rope pushdown",
+          "reps": "12-15",
+          "rest": "60-75 sec",
+          "sets": 2
+        }
+      ],
+      "focus": "Lower-body strength + full arm coverage.",
+      "title": "Legs + Biceps + Triceps A",
+      "weekday": "Tuesday",
+      "blocks": [
+        {
+          "title": "Warm-up",
+          "minutes": 10,
+          "exercises": []
+        },
+        {
+          "title": "Quads / glutes",
+          "minutes": 30,
+          "exercises": [
+            "Back squat / hack squat",
+            "Leg press",
+            "Bulgarian split squat",
+            "Leg extension"
+          ]
+        },
+        {
+          "title": "Hamstrings / glutes",
+          "minutes": 22,
+          "exercises": [
+            "Romanian deadlift",
+            "Seated / lying leg curl",
+            "Hip thrust"
+          ]
+        },
+        {
+          "title": "Adductors / abductors / lower leg",
+          "minutes": 18,
+          "exercises": [
+            "Adductor machine",
+            "Abductor machine",
+            "Standing calf raise",
+            "Tibialis raises"
+          ]
+        },
+        {
+          "title": "Arms",
+          "minutes": 15,
+          "exercises": [
+            "Incline DB curl",
+            "Hammer curl",
+            "Overhead cable extension",
+            "Rope pushdown"
+          ]
+        },
+        {
+          "title": "Cool-down",
+          "minutes": 5,
+          "exercises": []
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "exercises": [
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Lats, teres major, biceps, forearms",
+          "name": "Pull-up",
+          "reps": "6-10",
+          "rest": "2-3 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Lats, biceps, brachialis",
+          "name": "Neutral-grip pull-up",
+          "reps": "6-10",
+          "rest": "2 min",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Rectus abdominis",
+          "name": "Cable crunch",
+          "reps": "10-15",
+          "rest": "60-75 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Rectus abdominis + hip flexors",
+          "name": "Hanging knee/leg raise",
+          "reps": "8-12",
+          "rest": "60-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Transverse abdominis / obliques",
+          "name": "Pallof press",
+          "reps": "10-12/side",
+          "rest": "60 sec",
+          "sets": 3
+        },
+        {
+          "effort": "Controlled",
+          "muscles": "Internal/external oblique, QL",
+          "name": "Side plank",
+          "reps": "30-45 sec/side",
+          "rest": "45-60 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Transverse abdominis, rectus abdominis",
+          "name": "Ab wheel / body saw",
+          "reps": "6-12",
+          "rest": "60-90 sec",
+          "sets": 2
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Forearm flexors",
+          "name": "Wrist curl",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Forearm extensors",
+          "name": "Reverse wrist curl",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Pronator teres + supinator",
+          "name": "Cable/band pronation + supination",
+          "reps": "12-15 each",
+          "rest": "45-60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "Easy",
+          "muscles": "Deep neck flexors + posterior neck",
+          "name": "Neck isometric flexion/extension",
+          "note": "Very light and controlled. No aggressive automated correction. Stop immediately for pain, dizziness, numbness or unusual symptoms. Do not use rapid neck circles or heavy weighted neck flexion.",
+          "reps": "10-15 sec each",
+          "rest": "45-60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "Easy",
+          "muscles": "SCM + lateral neck stabilizers",
+          "name": "Neck lateral isometric",
+          "note": "Very light and controlled. No aggressive automated correction. Stop immediately for pain, dizziness, numbness or unusual symptoms.",
+          "reps": "10-15 sec/side",
+          "rest": "45-60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "Final set failure",
+          "muscles": "Chest, triceps, anterior deltoid",
+          "name": "Push-ups",
+          "reps": "8-20 + final set to technical failure",
+          "rest": "75 sec",
+          "sets": 2
+        }
+      ],
+      "focus": "Accessory/anatomy day; controlled fatigue. Do not turn every movement into maximal failure.",
+      "title": "Abs + Pull-ups + Forearms + Neck + Push-ups",
+      "weekday": "Wednesday",
+      "blocks": [
+        {
+          "title": "Warm-up",
+          "minutes": 8,
+          "exercises": []
+        },
+        {
+          "title": "Pull-ups",
+          "minutes": 20,
+          "exercises": [
+            "Pull-up",
+            "Neutral-grip pull-up"
+          ]
+        },
+        {
+          "title": "Abs / core",
+          "minutes": 28,
+          "exercises": [
+            "Cable crunch",
+            "Hanging knee/leg raise",
+            "Pallof press",
+            "Side plank",
+            "Ab wheel / body saw"
+          ]
+        },
+        {
+          "title": "Forearms",
+          "minutes": 16,
+          "exercises": [
+            "Wrist curl",
+            "Reverse wrist curl",
+            "Cable/band pronation + supination"
+          ]
+        },
+        {
+          "title": "Neck",
+          "minutes": 10,
+          "exercises": [
+            "Neck isometric flexion/extension",
+            "Neck lateral isometric"
+          ]
+        },
+        {
+          "title": "Push-up finisher + cool-down",
+          "minutes": 18,
+          "exercises": [
+            "Push-ups"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "exercises": [
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Pectoralis major",
+          "name": "Machine or DB chest press",
+          "reps": "8-12",
+          "rest": "2 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Pectoralis major, anterior deltoid",
+          "name": "Low-incline DB press",
+          "reps": "8-12",
+          "rest": "90-120 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Pectoralis major; shortened position",
+          "name": "High-to-low cable fly",
+          "reps": "12-15",
+          "rest": "60-75 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Serratus anterior",
+          "name": "Cable serratus punch",
+          "reps": "12-15/side",
+          "rest": "45-60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Latissimus dorsi, teres major",
+          "name": "Lat pulldown",
+          "reps": "8-12",
+          "rest": "2 min",
+          "sets": 4
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Rhomboids, middle traps, lats",
+          "name": "Seated cable row",
+          "reps": "8-12",
+          "rest": "90-120 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Latissimus dorsi, teres major",
+          "name": "1-arm DB row",
+          "reps": "10-12/side",
+          "rest": "90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Upper trapezius",
+          "name": "Shrug",
+          "reps": "10-15",
+          "rest": "75-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "2 RIR",
+          "muscles": "Erector spinae + glutes",
+          "name": "Back extension / reverse hyper",
+          "reps": "12-15",
+          "rest": "60-90 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Anterior + lateral deltoid",
+          "name": "Landmine press",
+          "reps": "8-12",
+          "rest": "90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Lateral deltoid",
+          "name": "Lean-away lateral raise",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 4
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Posterior deltoid",
+          "name": "Cable rear-delt fly",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 3
+        },
+        {
+          "effort": "2 RIR",
+          "muscles": "Rotator cuff",
+          "name": "External rotation",
+          "note": "Keep the exercise order but use a slightly lighter load than Day 1 and focus on range of motion.",
+          "reps": "15-20",
+          "rest": "45-60 sec",
+          "sets": 2
+        }
+      ],
+      "focus": "Different angles + higher-rep hypertrophy. Second weekly exposure.",
+      "title": "Chest + Back + Shoulders B",
+      "weekday": "Thursday",
+      "blocks": [
+        {
+          "title": "Warm-up",
+          "minutes": 10,
+          "exercises": []
+        },
+        {
+          "title": "Chest",
+          "minutes": 25,
+          "exercises": [
+            "Machine or DB chest press",
+            "Low-incline DB press",
+            "High-to-low cable fly",
+            "Cable serratus punch"
+          ]
+        },
+        {
+          "title": "Back",
+          "minutes": 30,
+          "exercises": [
+            "Lat pulldown",
+            "Seated cable row",
+            "1-arm DB row",
+            "Shrug",
+            "Back extension / reverse hyper"
+          ]
+        },
+        {
+          "title": "Shoulders",
+          "minutes": 25,
+          "exercises": [
+            "Landmine press",
+            "Lean-away lateral raise",
+            "Cable rear-delt fly",
+            "External rotation"
+          ]
+        },
+        {
+          "title": "Cool-down",
+          "minutes": 10,
+          "exercises": []
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "exercises": [
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Quadriceps, gluteals, adductors",
+          "name": "Front squat / hack squat",
+          "reps": "8-10",
+          "rest": "2 min",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Quads, glutes, adductors, abductors",
+          "name": "Walking lunge",
+          "reps": "10-12/leg",
+          "rest": "90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Quadriceps",
+          "name": "Leg extension",
+          "reps": "12-15",
+          "rest": "60-75 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Hamstrings, glutes, erector spinae",
+          "name": "Romanian deadlift / good morning",
+          "reps": "8-10",
+          "rest": "2 min",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Hamstrings",
+          "name": "Lying leg curl",
+          "reps": "10-15",
+          "rest": "75-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Gluteals",
+          "name": "Hip thrust / glute bridge",
+          "reps": "10-12",
+          "rest": "90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Soleus / calves",
+          "name": "Seated calf raise",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Tibialis anterior",
+          "name": "Tibialis raises",
+          "reps": "15-20",
+          "rest": "45-60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Adductors",
+          "name": "Cable hip adduction",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Abductors / glute medius region",
+          "name": "Cable hip abduction",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Biceps short-head bias",
+          "name": "Preacher curl",
+          "reps": "8-12",
+          "rest": "75-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Brachioradialis + forearms",
+          "name": "Reverse curl",
+          "reps": "10-12",
+          "rest": "60-75 sec",
+          "sets": 2
+        },
+        {
+          "effort": "1-2 RIR",
+          "muscles": "Triceps lateral/medial + chest",
+          "name": "Close-grip bench press",
+          "reps": "6-10",
+          "rest": "2 min",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Triceps long head",
+          "name": "Cable overhead extension",
+          "reps": "10-12",
+          "rest": "75-90 sec",
+          "sets": 3
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Triceps lateral + medial heads",
+          "name": "Rope pushdown",
+          "reps": "12-15",
+          "rest": "60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "0-2 RIR",
+          "muscles": "Rectus abdominis",
+          "name": "Reverse crunch",
+          "reps": "12-15",
+          "rest": "45-60 sec",
+          "sets": 2
+        },
+        {
+          "effort": "Controlled",
+          "muscles": "Transverse abdominis / core control",
+          "name": "Dead bug",
+          "reps": "8-12/side",
+          "rest": "45-60 sec",
+          "sets": 2
+        }
+      ],
+      "focus": "Second weekly lower/arm exposure + core.",
+      "title": "Legs + Biceps + Triceps B + Abs",
+      "weekday": "Friday",
+      "blocks": [
+        {
+          "title": "Warm-up",
+          "minutes": 10,
+          "exercises": []
+        },
+        {
+          "title": "Quads / glutes",
+          "minutes": 25,
+          "exercises": [
+            "Front squat / hack squat",
+            "Walking lunge",
+            "Leg extension"
+          ]
+        },
+        {
+          "title": "Hamstrings / glutes",
+          "minutes": 20,
+          "exercises": [
+            "Romanian deadlift / good morning",
+            "Lying leg curl",
+            "Hip thrust / glute bridge"
+          ]
+        },
+        {
+          "title": "Calves / tibialis / hips",
+          "minutes": 15,
+          "exercises": [
+            "Seated calf raise",
+            "Tibialis raises",
+            "Cable hip adduction",
+            "Cable hip abduction"
+          ]
+        },
+        {
+          "title": "Arms",
+          "minutes": 20,
+          "exercises": [
+            "Preacher curl",
+            "Reverse curl",
+            "Close-grip bench press",
+            "Cable overhead extension",
+            "Rope pushdown"
+          ]
+        },
+        {
+          "title": "Abs",
+          "minutes": 10,
+          "exercises": [
+            "Reverse crunch",
+            "Dead bug"
+          ]
+        }
+      ]
+    }
+  ],
+  "progression": "When you reach the top of the rep range for every set with clean form, add the smallest practical weight next session.",
+  "restDays": [
+    {
+      "day": 6,
+      "note": "Walking, mobility, recovery.",
+      "title": "Rest and recovery",
+      "weekday": "Saturday"
+    },
+    {
+      "day": 7,
+      "note": "Full recovery / optional easy walking. Focus on sleep, nutrition and hydration.",
+      "title": "Rest and recovery",
+      "weekday": "Sunday"
+    }
+  ],
+  "rule": "Most compound sets at 1-2 RIR. True failure mainly for safer bodyweight/isolation work, such as the final push-up set. Do not take heavy squats, presses, deadlifts, or neck work to failure. Neck work: very light and controlled. Stop immediately for pain, dizziness, numbness or unusual symptoms.",
+  "sessionMinutes": 100,
+  "source": "5_Day_100_Min_Gym_Anatomy_Workout_Plan__2.pdf — transcribed exactly; do not edit this bundled file. User edits are stored separately and this file is the restore source."
+}
