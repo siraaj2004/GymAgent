@@ -1,0 +1,30 @@
+name: GymAI tests and unsigned IPA
+
+# Run from GitHub: repo -> Actions -> this workflow -> Run workflow.
+# Output is an UNSIGNED .ipa artifact. Install from Windows with Sideloadly or
+# AltStore, which sign it with your Apple ID. It is NOT a signed App Store build,
+# and no IPA is claimed until this workflow actually produces one.
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s /Applications/Xcode_16.3.app || sudo xcode-select -s /Applications/Xcode_16.2.app || sudo xcode-select -s /Applications/Xcode.app
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Run tests
+        run: xcodebuild test -project GymAI.xcodeproj -scheme GymAI -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' CODE_SIGNING_ALLOWED=NO || xcodebuild test -project GymAI.xcodeproj -scheme GymAI -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+      - name: Build device app (unsigned) and package IPA
+        run: bash scripts/package-unsigned-ipa.sh
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GymAI-unsigned-ipa
+          path: build/GymAI-unsigned.ipa
+          retention-days: 14
