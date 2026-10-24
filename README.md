@@ -64,6 +64,10 @@ Isolated project. It does NOT touch, edit, or depend on:
   local storage, export/delete to be added via SwiftData store management.
   Camera/mic/notification permissions are declared in `App/Info.plist`.
 
+## New in 1.3.0 (Help Chat relevance fix)
+- **Help Chat now answers relevantly**: the old code stopped at the first keyword it found, so a food question containing the word "count" could get a camera answer. Now every topic is scored against the whole question (strong words 2 points, weak words 1) and the highest score wins — "count calories" gives Food, "count reps" gives Camera. Unknown questions no longer get a guessed unrelated answer; they ask which topic it is.
+- **Quick topic buttons in Help Chat**: Camera, Voice, Food, Workout, Install, Reminders — one tap asks a relevant question and gets the matching fix steps.
+
 ## New in 1.2.0 (icon, after 1.1.0)
 - **App icon** — dark navy background with a bright mint dumbbell, in App/Assets.xcassets/AppIcon.appiconset at all iOS sizes (40–1024 px), set as ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon. The app previously had no icon, so iOS showed a blank default.
 
