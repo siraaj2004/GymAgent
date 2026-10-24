@@ -73,8 +73,10 @@ enum FoodPhotoDetector {
             }
             DispatchQueue.main.async { completion(results) }
         }
-        request.imageCropAndScaleOption = .centerCrop
-        let handler = VNImageRequestHandler(cgImage, orientation: orientation, options: [:])
+        // NOTE: VNClassifyImageRequest has no imageCropAndScaleOption member
+        // in the Xcode 16.4 SDK, so no crop option is set here — Vision uses
+        // its default scaling and the classifier still runs as intended.
+        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: orientation, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
             do { try handler.perform([request]) } catch { DispatchQueue.main.async { completion([]) } }
         }
