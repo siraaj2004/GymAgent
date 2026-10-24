@@ -81,6 +81,15 @@ struct HelpChatView: View {
         VStack(spacing: 12) {
             Text("Help Chat").font(.largeTitle).bold()
             Text("Raise a complaint here. I will try to fix it with steps now. If it still does not work, it will be marked for the next app update.").font(.caption).foregroundColor(GymTheme.secondaryText).multilineTextAlignment(.center)
+            // Quick topics: one tap asks a relevant question, so the answer
+            // is about that problem — not an unrelated one.
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(["Camera not counting reps", "Voice not speaking", "Food protein target wrong", "Workout day wrong", "App crashes on open", "Reminder not coming"], id: \.self) { topic in
+                        Button(topic) { sendText(topic) }.buttonStyle(.bordered).tint(GymTheme.accent)
+                    }
+                }
+            }
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(messages) { m in
@@ -115,6 +124,11 @@ struct HelpChatView: View {
     private func send() {
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
+        input = ""
+        sendText(text)
+    }
+
+    private func sendText(_ text: String) {
         messages.append(ChatMessage(text: text, isUser: true))
         let solution = HelpAssistant.solution(for: text)
         let c = HelpComplaint(); c.message = text; c.solutionGiven = solution; c.status = "Open"
