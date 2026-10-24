@@ -32,6 +32,53 @@ final class VoiceCoach: NSObject, ObservableObject, AVSpeechSynthesizerDelegate 
         }
     }
 
+    // MARK: - Human-like Telugu voice
+    // Honest note: no automated voice is a real human recording. The bundled
+    // clips (Resources/TeluguVoice/*.mp3, generated with te-IN-ShrutiNeural,
+    // see scripts/generate_telugu_voice.py) are a neural voice trained on
+    // human speech — far more natural than AVSpeech — and they play offline.
+    // If a clip is missing, this falls back to AVSpeech te-IN.
+    private var teluguPlayer: AVAudioPlayer?
+
+    /// Map an English correction to a bundled Telugu clip key, or nil.
+    static func teluguClipKey(for text: String) -> String? {
+        let t = text.lowercased()
+        if t.contains("good repetition") { return "good_rep" }
+        if t.contains("elbows closer") || t.contains("elbows close") { return "elbows_close" }
+        if t.contains("both sides even") { return "sides_even" }
+        if t.contains("shoulder height") { return "shoulder_height" }
+        if t.contains("hips level") || t.contains("sag or pike") { return "hips_level" }
+        if t.contains("lower slowly") || t.contains("lower under control") || t.contains("lowering") { return "lower_slowly" }
+        if t.contains("chest stable") { return "chest_stable" }
+        if t.contains("control your descent") || t.contains("control the movement") { return "control_descent" }
+        if t.contains("press smoothly") || t.contains("press") { return "press_smoothly" }
+        if t.contains("good depth") { return "good_depth" }
+        if t.contains("back flat") { return "keep_back_flat" }
+        if t.contains("unable to assess") { return "unable_assess" }
+        if t.contains("pain") { return "pain_stop" }
+        return nil
+    }
+
+    /// Speak a correction in the user's trainer language. For Telugu / Mixed,
+    /// prefer the bundled human-like Telugu clip; otherwise use AVSpeech.
+    func speakCorrection(_ text: String, language: String) {
+        if language == "Telugu" || language == "Mixed Telugu and English",
+           let key = Self.teluguClipKey(for: text),
+           let url = Bundle.main.url(forResource: key, withExtension: "mp3", subdirectory: "TeluguVoice"),
+           let player = try? AVAudioPlayer(contentsOf: url) {
+            // Respect the same mute + repeat suppression as speak().
+            guard !isMuted else { return }
+            let now = Date()
+            if let last = lastSpoken[text], now.timeIntervalSince(last) < 5 { return }
+            lastSpoken[text] = now
+            teluguPlayer = player
+            player.volume = volume
+            player.play()
+            return
+        }
+        speak(text, language: language, correction: true)
+    }
+
     /// correction=true bypasses the praise path but still respects a 3-second correction cooldown.
     func speak(_ text: String, language: String, correction: Bool = false) {
         guard !isMuted, !text.isEmpty else { return }
