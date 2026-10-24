@@ -10,7 +10,8 @@
 	<key>CFBundlePackageType</key><string>APPL</string>
 	<key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>NSCameraUsageDescription</key><string>GYM AI uses the camera to detect your exercise posture in real time and count repetitions. Video is processed on-device and is not uploaded by default.</string>
+	<key>NSCameraUsageDescription</key><string>GYM AI uses the camera to detect your exercise posture in real time and count repetitions, and to take a photo of your food for food logging. Photos are stored on your phone only, with your food entry.</string>
+	<key>NSPhotoLibraryUsageDescription</key><string>GYM AI can use a photo you choose from your library to log that food, with the photo stored on your phone only, with your food entry.</string>
 	<key>NSMicrophoneUsageDescription</key><string>GYM AI can listen for voice commands such as Start workout, Next exercise, Pause workout, How many reps, and End workout. Touch controls always work as a fallback.</string>
 	<key>NSUserNotificationsUsageDescription</key><string>GYM AI sends workout reminders at your chosen gym time, a 30-minute warning, and rest-day messages.</string>
 	<key>NSHealthShareUsageDescription</key><string>GYM AI can read health data only if you enable it in the future. It is not required for workouts, food logging, or progress.</string>
