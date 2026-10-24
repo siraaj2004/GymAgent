@@ -3,7 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key><string>GYM AI</string>
+	<key>CFBundleExecutable</key><string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key><string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
 	<key>CFBundleName</key><string>GymAI</string>
+	<key>CFBundlePackageType</key><string>APPL</string>
+	<key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSCameraUsageDescription</key><string>GYM AI uses the camera to detect your exercise posture in real time and count repetitions. Video is processed on-device and is not uploaded by default.</string>
 	<key>NSMicrophoneUsageDescription</key><string>GYM AI can listen for voice commands such as Start workout, Next exercise, Pause workout, How many reps, and End workout. Touch controls always work as a fallback.</string>
 	<key>NSUserNotificationsUsageDescription</key><string>GYM AI sends workout reminders at your chosen gym time, a 30-minute warning, and rest-day messages.</string>
