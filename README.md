@@ -64,6 +64,10 @@ Isolated project. It does NOT touch, edit, or depend on:
   local storage, export/delete to be added via SwiftData store management.
   Camera/mic/notification permissions are declared in `App/Info.plist`.
 
+## New in 1.1.0
+- **Low-price personal nutrition** — Food → "Low-price nutrition for my weight & height": your daily protein, carbs, fibre and calories from your onboarding weight/height/age/activity/goal, what is still needed today, and cheap ways to fill it (soya chunks, dal, eggs, milk, curd, oats, etc., all marked Low cost). Cost tiers are approximate, not exact rupee prices.
+- **Help Chat** — new Help tab: type a complaint about the app, get fix steps immediately, tap "This solved it" or "Still not solved". Solved complaints are marked Solved; still-not-solved complaints are marked Escalated for fixing in the next app version, because an installed IPA cannot rewrite its own code — a real bug fix needs a new build.
+
 ## What is NOT yet verified / NOT claimed
 
 - **No IPA exists yet.** This VM has no macOS/Xcode/Swift, so no build or test
