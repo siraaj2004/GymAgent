@@ -78,4 +78,10 @@ enum FoodDatabase {
         guard item.protein > 0 else { return 0 }
         return (proteinTarget / item.protein * item.grams).rounded()
     }
+
+    /// Grams of a food needed to get a target amount of carbs, same idea as protein.
+    static func gramsForCarbs(_ item: FoodItem, carbTarget: Double) -> Double {
+        guard item.carbs > 0 else { return 0 }
+        return (carbTarget / item.carbs * item.grams).rounded()
+    }
 }
