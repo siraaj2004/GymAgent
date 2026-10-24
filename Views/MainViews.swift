@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import AVFoundation
+import UIKit
 
 struct ContentView: View {
     @AppStorage("hasCompletedOnboarding") private var done = false
@@ -179,11 +180,15 @@ struct FoodView: View {
     @State private var vegOnly = false
     @State private var meal = "Breakfast"
     @State private var waterMl = 0
+    @State private var showPhotoFood = false
     var body: some View {
         NavigationStack {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Food").font(.largeTitle).bold()
+                Button("📸 Log food by photo →") { showPhotoFood = true }
+                    .buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                    .sheet(isPresented: $showPhotoFood) { PhotoFoodView() }
                 NavigationLink("Low-price nutrition for my weight & height →") { LowPriceNutritionView() }
                     .buttonStyle(.borderedProminent).tint(GymTheme.accent)
                 if let p = profiles.first {
@@ -230,7 +235,27 @@ struct FoodView: View {
                         Button("Add 250 ml") { waterMl += 250; let w = WaterEntry(); w.millilitres = 250; context.insert(w); try? context.save() }
                     }
                 }
-                Text("Barcode scanning and photo meal estimation require a nutrition API / on-device model key and are not claimed as exact. Use search + manual grams for reliable logging.").font(.caption).foregroundColor(GymTheme.secondaryText)
+                GymCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Today's food").font(.headline)
+                        let todayEntries = foods.filter { Calendar.current.isDateInToday($0.date) }
+                        if todayEntries.isEmpty { Text("Nothing logged yet today. Tap 'Log food by photo' above, or search below.").foregroundColor(GymTheme.secondaryText) }
+                        ForEach(todayEntries) { e in
+                            HStack {
+                                if let data = e.photoData, let img = UIImage(data: data) {
+                                    Image(uiImage: img).resizable().scaledToFill().frame(width: 40, height: 40).cornerRadius(8)
+                                }
+                                VStack(alignment: .leading) {
+                                    Text(e.foodName).font(.headline)
+                                    Text("\(e.meal) · \(Int(e.grams)) g: \(Int(e.calories)) kcal, \(e.protein, specifier: "%.1f") g protein, \(e.carbs, specifier: "%.1f") g carbs")
+                                }
+                                Spacer()
+                                Button("Delete") { context.delete(e); try? context.save() }.foregroundColor(.red)
+                            }
+                        }
+                    }
+                }
+                Text("Photo food logging saves your photo with the entry and calculates macros from the food and grams you confirm. Automatic photo recognition is not claimed — it would need a food AI model or nutrition API key, which is not bundled.").font(.caption).foregroundColor(GymTheme.secondaryText)
             }.padding()
         }.background(GymTheme.background)
         }
