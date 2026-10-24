@@ -11,6 +11,12 @@ struct PlanExercise: Codable, Identifiable, Hashable {
     var note: String?
 }
 
+struct PlanBlock: Codable, Hashable {
+    var title: String
+    var minutes: Int
+    var exercises: [String]
+}
+
 struct PlanDay: Codable, Identifiable, Hashable {
     var id: Int { day }
     var day: Int
@@ -18,7 +24,40 @@ struct PlanDay: Codable, Identifiable, Hashable {
     var focus: String
     var weekday: String
     var exercises: [PlanExercise]
+    var blocks: [PlanBlock]?
     var note: String?
+}
+
+/// Time segregation, explained honestly:
+/// - Block minutes (warm-up, chest, back, etc.) are EXACTLY as printed in the PDF
+///   and always sum to 100 minutes per day.
+/// - Per-exercise minutes are ESTIMATES only (the PDF gives no per-exercise time):
+///   sets x ~0.6 min of work + rest between sets (rest parsed from the PDF rest
+///   column, averaged when it is a range like "2-3 min" or "60-90 sec").
+///   They are shown with a "~" and must not be read as prescribed times.
+enum TimeEstimator {
+    static func restMinutes(_ rest: String) -> Double {
+        let r = rest.lowercased()
+        func avg(_ a: Double, _ b: Double) -> Double { (a + b) / 2 }
+        if r.contains("min") {
+            let nums = r.components(separatedBy: CharacterSet.decimalDigits.inverted).compactMap(Double.init)
+            if nums.count >= 2 { return avg(nums[0], nums[1]) }
+            if let first = nums.first { return first }
+            return 1
+        }
+        if r.contains("sec") {
+            let nums = r.components(separatedBy: CharacterSet.decimalDigits.inverted).compactMap(Double.init)
+            if nums.count >= 2 { return avg(nums[0], nums[1]) / 60 }
+            if let first = nums.first { return first / 60 }
+            return 1
+        }
+        return 1
+    }
+
+    static func estimatedMinutes(for exercise: PlanExercise) -> Double {
+        let rest = restMinutes(exercise.rest)
+        return Double(exercise.sets) * 0.6 + Double(max(0, exercise.sets - 1)) * rest
+    }
 }
 
 struct RestDay: Codable {
