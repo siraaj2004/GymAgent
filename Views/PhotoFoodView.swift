@@ -9,14 +9,14 @@ import UIKit
 /// 3. Adjust the grams — the app calculates protein, carbs, fat, fibre and
 ///    calories instantly, and saves them with the photo.
 ///
-/// HONEST LIMIT — READ THIS BEFORE CLAIMING MORE: this screen does NOT
-/// automatically identify the food from the photo. iOS has no built-in
-/// food recogniser, and no food-AI model or nutrition API key is bundled
-/// with this app. Automatic photo recognition would need either a trained
-/// food model added to the app, or a nutrition API key — neither is in
-/// this build. What IS real here: the photo is saved with the entry, and
-/// the macros are calculated exactly from the food and grams YOU confirm.
-/// Values are estimates for the stated grams, not laboratory measurements.
+/// AUTOMATIC DETECTION: after a photo is taken / chosen, the app runs
+/// Apple's built-in Vision classifier on-device (no upload, no API key)
+/// and auto-selects the closest food in the database when it matches,
+/// showing the label + confidence for the user to confirm. The classifier
+/// is general-purpose, not Indian-food-specific, so detection is a guess
+/// and manual tap is always the fallback. Macros are calculated exactly
+/// from the food and grams YOU confirm. Values are estimates for the
+/// stated grams, not laboratory measurements.
 struct PhotoFoodView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -31,6 +31,19 @@ struct PhotoFoodView: View {
     @State private var grams: Double = 100
     @State private var meal = "Breakfast"
     @State private var saved = false
+    @State private var detected: [DetectedFood] = []
+    @State private var detecting = false
+
+    private func runDetection() {
+        guard let photo else { return }
+        detecting = true; detected = []
+        FoodPhotoDetector.classify(image: photo) { results in
+            detected = results; detecting = false
+            if let match = results.first(where: { $0.matchedFood != nil })?.matchedFood {
+                selected = match; grams = match.grams
+            }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -50,6 +63,33 @@ struct PhotoFoodView: View {
                                     Button("📸 Take photo") { showCamera = true }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
                                     PhotosPicker(selection: $pickerItem, matching: .images) { Text("🖼 Choose photo") }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
                                 }
+                            }
+                        }
+                    }
+
+                    GymCard {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Automatic detection").font(.headline)
+                            if photo == nil {
+                                Text("Take or choose a photo first — the app will try to detect the food automatically, on your phone, with no photo upload.")
+                            } else if detecting {
+                                Text("Detecting food in your photo…")
+                            } else if detected.isEmpty {
+                                Text("Could not auto-detect this photo. Tap the correct food below — that is the fallback.")
+                                Button("Detect again") { runDetection() }
+                            } else {
+                                ForEach(detected) { d in
+                                    HStack {
+                                        Text("\(d.label) — \(Int(d.confidence * 100))% sure")
+                                        Spacer()
+                                        if let food = d.matchedFood {
+                                            Button("Use \(food.name)") { selected = food; grams = food.grams }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                                        } else {
+                                            Text("Not in food list — tap correct food below").foregroundColor(GymTheme.secondaryText)
+                                        }
+                                    }
+                                }
+                                Text("Detection is a guess, not a measurement — always confirm the food and grams before saving. Apple's built-in classifier knows common objects, not specifically Indian food, so dal / chapati / thali may be guessed as curry / bread / pancake.").font(.caption).foregroundColor(GymTheme.secondaryText)
                             }
                         }
                     }
@@ -143,15 +183,15 @@ struct PhotoFoodView: View {
                         }
                     }
 
-                    Text("Photo note: the app does not auto-identify food from the photo yet — you tap the food name, and the app calculates the macros. That keeps the numbers honest instead of guessing from a picture. Automatic recognition would need a food AI model or nutrition API key added in a future version.").font(.caption).foregroundColor(GymTheme.secondaryText)
+                    Text("Photo note: automatic detection uses Apple's built-in on-device classifier — it tries to name the food and shows how sure it is, then you confirm it. If it guesses wrong, tap the correct food below. Macros are calculated from the confirmed food and grams.").font(.caption).foregroundColor(GymTheme.secondaryText)
                 }.padding()
             }.background(GymTheme.background)
             .navigationTitle("Photo food")
             .toolbar { Button("Close") { dismiss() } }
-            .sheet(isPresented: $showCamera) { CameraPicker(image: $photo) }
+            .sheet(isPresented: $showCamera, onDismiss: { if photo != nil { runDetection() } }) { CameraPicker(image: $photo) }
             .onChange(of: pickerItem) {
                 Task {
-                    if let data = try? await pickerItem?.loadTransferable(type: Data.self), let img = UIImage(data: data) { photo = img }
+                    if let data = try? await pickerItem?.loadTransferable(type: Data.self), let img = UIImage(data: data) { photo = img; runDetection() }
                 }
             }
         }
