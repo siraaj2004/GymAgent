@@ -15,6 +15,7 @@ struct ContentView: View {
                 AICoachView().tabItem { Label("AI Coach", systemImage: "camera") }
                 FoodView().tabItem { Label("Food", systemImage: "fork.knife") }
                 ProgressViewTab().tabItem { Label("Progress", systemImage: "chart.bar") }
+                HelpChatView().tabItem { Label("Help", systemImage: "questionmark.circle") }
             }
             .environmentObject(planStore).environmentObject(coach)
             .preferredColorScheme(.dark)
@@ -173,9 +174,12 @@ struct FoodView: View {
     @State private var meal = "Breakfast"
     @State private var waterMl = 0
     var body: some View {
+        NavigationStack {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Food").font(.largeTitle).bold()
+                NavigationLink("Low-price nutrition for my weight & height →") { LowPriceNutritionView() }
+                    .buttonStyle(.borderedProminent).tint(GymTheme.accent)
                 if let p = profiles.first {
                     let t = NutritionCalculator.calculate(age: p.age, weightKg: p.weightKg, heightCm: p.heightCm, sex: p.sex, activityLevel: p.activityLevel, goal: p.goal)
                     let today = foods.filter { Calendar.current.isDateInToday($0.date) }
@@ -223,6 +227,7 @@ struct FoodView: View {
                 Text("Barcode scanning and photo meal estimation require a nutrition API / on-device model key and are not claimed as exact. Use search + manual grams for reliable logging.").font(.caption).foregroundColor(GymTheme.secondaryText)
             }.padding()
         }.background(GymTheme.background)
+        }
     }
 }
 
