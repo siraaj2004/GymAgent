@@ -94,6 +94,19 @@ final class GymAITests: XCTestCase {
         }
     }
 
+    func testLowCostFoodsAndProteinGrams() {
+        XCTAssertFalse(FoodDatabase.lowCostFoods.isEmpty)
+        XCTAssertTrue(FoodDatabase.lowCostFoods.allSatisfy { $0.costTier == "Low" })
+        XCTAssertTrue(FoodDatabase.lowCostFoods.contains { $0.name == "Soya chunks" })
+        let soya = FoodDatabase.lowCostFoods.first { $0.name == "Soya chunks" }!
+        XCTAssertEqual(FoodDatabase.gramsForProtein(soya, proteinTarget: 52), 100, accuracy: 1)
+    }
+
+    func testHelpAssistantGivesCameraAndVoiceSolutions() {
+        XCTAssertTrue(HelpAssistant.solution(for: "camera not detecting my squat").contains("Camera help"))
+        XCTAssertTrue(HelpAssistant.solution(for: "voice not speaking in telugu").contains("Voice help"))
+    }
+
     func testExerciseKindMapping() {
         XCTAssertEqual(ExerciseKind.forExercise("Back squat / hack squat"), .squat)
         XCTAssertEqual(ExerciseKind.forExercise("Incline DB curl"), .bicepCurl)
