@@ -82,6 +82,18 @@ final class GymAITests: XCTestCase {
         XCTAssertFalse(r.assessable)
     }
 
+    func testTimeBlocksSumTo100AndCoverEveryExerciseOnce() throws {
+        let url = Bundle.main.url(forResource: "workout-plan", withExtension: "json")!
+        let plan = try JSONDecoder().decode(WorkoutPlan.self, from: Data(contentsOf: url))
+        for day in plan.days {
+            let blocks = try XCTUnwrap(day.blocks, "Day \(day.day) must have time blocks")
+            XCTAssertEqual(blocks.reduce(0) { $0 + $1.minutes }, 100, "Day \(day.day) blocks must sum to 100 min")
+            let covered = blocks.flatMap { $0.exercises }
+            XCTAssertEqual(covered.count, day.exercises.count)
+            XCTAssertEqual(Set(covered), Set(day.exercises.map { $0.name }))
+        }
+    }
+
     func testExerciseKindMapping() {
         XCTAssertEqual(ExerciseKind.forExercise("Back squat / hack squat"), .squat)
         XCTAssertEqual(ExerciseKind.forExercise("Incline DB curl"), .bicepCurl)
