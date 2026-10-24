@@ -46,6 +46,9 @@ struct HomeView: View {
                             Text("Today's workout").font(.headline)
                             if let day = planStore.today() {
                                 Text("Day \(day.day): \(day.title)"); Text("\(day.exercises.count) exercises · \(day.exercises.reduce(0) { $0 + $1.sets }) sets · 100 min").foregroundColor(GymTheme.secondaryText)
+                                if let blocks = day.blocks {
+                                    Text(blocks.map { "\($0.title) \($0.minutes) min" }.joined(separator: " · ")).font(.caption).foregroundColor(GymTheme.secondaryText)
+                                }
                             } else { Text(planStore.restMessage()) }
                         }
                     }
@@ -114,21 +117,37 @@ struct WorkoutView: View {
                         }
                     }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
                     Button("Stop — sharp pain / dizziness / numbness", role: .destructive) { painAlert = true }
-                    ForEach(day.exercises) { ex in
-                        GymCard {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(ex.name).font(.headline)
-                                Text(ex.muscles).foregroundColor(GymTheme.secondaryText)
-                                Text("\(ex.sets) sets x \(ex.reps) · Rest \(ex.rest) · \(ex.effort)")
-                                if let note = ex.note { Text(note).font(.caption).foregroundColor(.yellow) }
-                                HStack {
-                                    Button(completed.contains(ex.name) ? "✓ Done" : "Tap when done") {
-                                        completed.insert(ex.name)
-                                        if let s = session {
-                                            let r = SetRecord(); r.exerciseName = ex.name; r.setIndex = 1; r.reps = 10; context.insert(r); s.sets.append(r); try? context.save()
+                    // Segregated by time block, exactly as in the PDF. Block minutes
+                    // are prescribed; per-exercise minutes are estimates (shown with ~).
+                    if let blocks = day.blocks {
+                        ForEach(blocks, id: \.title) { block in
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("\(block.title) — \(block.minutes) min").font(.headline).foregroundColor(GymTheme.accent)
+                                if block.exercises.isEmpty {
+                                    Text(block.title == "Warm-up" ? "Easy cardio + mobility + 2–3 light warm-up sets on the first lift." : "Easy movement + breathing.")
+                                        .foregroundColor(GymTheme.secondaryText)
+                                }
+                                ForEach(block.exercises, id: \.self) { name in
+                                    if let ex = day.exercises.first(where: { $0.name == name }) {
+                                        GymCard {
+                                            VStack(alignment: .leading, spacing: 6) {
+                                                Text(ex.name).font(.headline)
+                                                Text(ex.muscles).foregroundColor(GymTheme.secondaryText)
+                                                Text("\(ex.sets) sets x \(ex.reps) · Rest \(ex.rest) · \(ex.effort)")
+                                                Text("~\(Int(TimeEstimator.estimatedMinutes(for: ex).rounded())) min (estimate)").font(.caption).foregroundColor(GymTheme.secondaryText)
+                                                if let note = ex.note { Text(note).font(.caption).foregroundColor(.yellow) }
+                                                HStack {
+                                                    Button(completed.contains(ex.name) ? "✓ Done" : "Tap when done") {
+                                                        completed.insert(ex.name)
+                                                        if let s = session {
+                                                            let r = SetRecord(); r.exerciseName = ex.name; r.setIndex = 1; r.reps = 10; context.insert(r); s.sets.append(r); try? context.save()
+                                                        }
+                                                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                                                    NavigationLink("AI Coach") { AICoachView(exerciseName: ex.name) }
+                                                }
+                                            }
                                         }
-                                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
-                                    NavigationLink("AI Coach") { AICoachView(exerciseName: ex.name) }
+                                    }
                                 }
                             }
                         }
