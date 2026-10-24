@@ -64,6 +64,11 @@ Isolated project. It does NOT touch, edit, or depend on:
   local storage, export/delete to be added via SwiftData store management.
   Camera/mic/notification permissions are declared in `App/Info.plist`.
 
+## New in 1.4.0 (Photo food logging + more user-friendly Food)
+- **Log food by photo** — Food → "Log food by photo": 1) Take a photo with the camera or choose one from your library, 2) Tap the food name that matches the photo, 3) Adjust grams with a stepper / quick presets and see protein, carbs, fat, fibre and calories calculated live, then Save. The photo is stored on the phone with the food entry, and today's Food log shows the photo thumbnail next to each entry, with a Delete button.
+- **Honest limit, stated in the app**: photo food logging does NOT auto-identify food from the photo. iOS has no built-in food recogniser and no food-AI model or nutrition API key is bundled. Automatic recognition would need a food model or API key added in a future version. What is real: photo + confirmed food + grams = calculated macros, with values marked as estimates.
+- **More user-friendly Food**: big photo button at the top of Food, today's food list with photos and plain-words totals, quick gram presets (50/100/150/200/300 g).
+
 ## New in 1.3.0 (Help Chat relevance fix)
 - **Help Chat now answers relevantly**: the old code stopped at the first keyword it found, so a food question containing the word "count" could get a camera answer. Now every topic is scored against the whole question (strong words 2 points, weak words 1) and the highest score wins — "count calories" gives Food, "count reps" gives Camera. Unknown questions no longer get a guessed unrelated answer; they ask which topic it is.
 - **Quick topic buttons in Help Chat**: Camera, Voice, Food, Workout, Install, Reminders — one tap asks a relevant question and gets the matching fix steps.
