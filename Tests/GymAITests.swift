@@ -107,6 +107,17 @@ final class GymAITests: XCTestCase {
         XCTAssertTrue(HelpAssistant.solution(for: "voice not speaking in telugu").contains("Voice help"))
     }
 
+    func testHelpAssistantAnswersRelevantlyNotFirstKeyword() {
+        // Old bug: "count" alone could pull the camera answer for a food question.
+        XCTAssertTrue(HelpAssistant.solution(for: "my food protein count is wrong").contains("Food help"))
+        XCTAssertTrue(HelpAssistant.solution(for: "camera is not counting my reps").contains("Camera help"))
+        XCTAssertTrue(HelpAssistant.solution(for: "app crashes when I open it").contains("Install help"))
+        XCTAssertTrue(HelpAssistant.solution(for: "reminder is not coming before gym").contains("Reminder help"))
+        XCTAssertTrue(HelpAssistant.solution(for: "my workout day is wrong today").contains("Workout help"))
+        // Unknown question must not pretend: it must ask for the topic.
+        XCTAssertTrue(HelpAssistant.solution(for: "xyzqq something strange").contains("could not match"))
+    }
+
     func testExerciseKindMapping() {
         XCTAssertEqual(ExerciseKind.forExercise("Back squat / hack squat"), .squat)
         XCTAssertEqual(ExerciseKind.forExercise("Incline DB curl"), .bicepCurl)
