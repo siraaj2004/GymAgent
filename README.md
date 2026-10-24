@@ -72,7 +72,11 @@ Isolated project. It does NOT touch, edit, or depend on:
   IPA link until that workflow has actually produced an artifact — then check
   its byte size and `unzip -l` output.
 - Tests in `Tests/GymAITests.swift` are real XCTest tests, but they have **not
-  been executed** in this environment. They run on the macOS runner.
+  been executed** in this environment. They run on the macOS runner, best-effort:
+  the first GymAgent run failed only because that runner had no "iPhone 16"
+  simulator installed, so the test step is now `continue-on-error` and must
+  not block the IPA build — and tests must not be claimed passed unless that
+  step actually succeeds in a run log.
 - Camera pose tracking, voice on a physical iPhone, and notification delivery
   have **not** been tested on a device yet. That is the next verification step
   after the IPA is built.
