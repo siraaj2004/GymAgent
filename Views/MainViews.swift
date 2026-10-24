@@ -255,7 +255,7 @@ struct FoodView: View {
                         }
                     }
                 }
-                Text("Photo food logging saves your photo with the entry and calculates macros from the food and grams you confirm. Automatic photo recognition is not claimed — it would need a food AI model or nutrition API key, which is not bundled.").font(.caption).foregroundColor(GymTheme.secondaryText)
+                Text("Photo food logging tries automatic detection on-device with Apple's built-in classifier, shows its label + confidence, and you confirm the food — then it calculates macros from the confirmed food and grams. Detection is a guess for Indian foods, so always confirm before saving.").font(.caption).foregroundColor(GymTheme.secondaryText)
             }.padding()
         }.background(GymTheme.background)
         }
