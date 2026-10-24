@@ -107,6 +107,20 @@ final class GymAITests: XCTestCase {
         XCTAssertTrue(HelpAssistant.solution(for: "voice not speaking in telugu").contains("Voice help"))
     }
 
+    func testPhotoFoodCalculation() {
+        // Photo food logging: user confirms food + grams, app calculates macros.
+        let rice = FoodDatabase.all.first { $0.name == "Cooked rice" }!
+        let scaled = FoodDatabase.scaled(rice, grams: 300)
+        XCTAssertEqual(scaled.calories, 390)
+        XCTAssertEqual(scaled.protein, 7.2, accuracy: 0.01)
+        XCTAssertEqual(scaled.carbs, 84)
+        XCTAssertEqual(scaled.fibre, 1.6, accuracy: 0.01)
+        let dal = FoodDatabase.all.first { $0.name == "Dal (toor)" }!
+        XCTAssertEqual(FoodDatabase.scaled(dal, grams: 200).protein, 12)
+        let entry = FoodEntry()
+        XCTAssertNil(entry.photoData)
+    }
+
     func testHelpAssistantAnswersRelevantlyNotFirstKeyword() {
         // Old bug: "count" alone could pull the camera answer for a food question.
         XCTAssertTrue(HelpAssistant.solution(for: "my food protein count is wrong").contains("Food help"))
