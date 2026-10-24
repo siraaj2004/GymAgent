@@ -117,6 +117,9 @@ final class GymAITests: XCTestCase {
         XCTAssertEqual(scaled.fibre, 1.6, accuracy: 0.01)
         let dal = FoodDatabase.all.first { $0.name == "Dal (toor)" }!
         XCTAssertEqual(FoodDatabase.scaled(dal, grams: 200).protein, 12)
+        let rice2 = FoodDatabase.all.first { $0.name == "Cooked rice" }!
+        XCTAssertEqual(FoodDatabase.gramsForCarbs(rice2, carbTarget: 42), 150)
+        XCTAssertTrue(FoodDatabase.lowCostFoods.contains { $0.name == "Dal (toor)" })
         let entry = FoodEntry()
         XCTAssertNil(entry.photoData)
     }
