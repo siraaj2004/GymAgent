@@ -61,6 +61,27 @@ final class GymAITests: XCTestCase {
         XCTAssertEqual(plan.restDays.count, 2)
     }
 
+    func testAllPlanExercisesHaveAPoseGuide() throws {
+        let url = Bundle.main.url(forResource: "workout-plan", withExtension: "json")!
+        let plan = try JSONDecoder().decode(WorkoutPlan.self, from: Data(contentsOf: url))
+        var missing: [String] = []
+        for day in plan.days {
+            for ex in day.exercises where AllExerciseGuide.guide(for: ex.name) == nil {
+                missing.append(ex.name)
+            }
+        }
+        XCTAssertTrue(missing.isEmpty, "Exercises without a pose guide: \(missing.joined(separator: ", "))")
+        // Neck must stay instructional, never aggressive.
+        XCTAssertEqual(AllExerciseGuide.guide(for: "Neck isometric flexion/extension")?.pattern, .neckInstructional)
+    }
+
+    func testUniversalAnalyzerNeverCountsUnassessableFrame() {
+        let a = UniversalExerciseAnalyzer(exerciseName: "Back squat / hack squat")
+        let r = a.update(frame: PoseFrame(points: [:], required: ["lHip", "lKnee", "lAnkle"]))
+        XCTAssertEqual(r.reps, 0)
+        XCTAssertFalse(r.assessable)
+    }
+
     func testExerciseKindMapping() {
         XCTAssertEqual(ExerciseKind.forExercise("Back squat / hack squat"), .squat)
         XCTAssertEqual(ExerciseKind.forExercise("Incline DB curl"), .bicepCurl)
