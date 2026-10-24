@@ -78,3 +78,16 @@ final class WaterEntry {
     var date: Date = Date()
     init() {}
 }
+
+/// A complaint / problem raised in Help Chat. Stored on the phone only.
+/// Status: Open -> Solved (workaround worked) or Escalated (needs a new app
+/// version — an installed IPA cannot fix its own code by itself, so escalated
+/// complaints are summarised for the developer to fix in the next build).
+@Model
+final class HelpComplaint {
+    var message: String = ""
+    var solutionGiven: String = ""
+    var status: String = "Open" // Open, Solved, Escalated
+    var date: Date = Date()
+    init() {}
+}
