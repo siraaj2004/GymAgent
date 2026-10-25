@@ -107,6 +107,16 @@ final class GymAITests: XCTestCase {
         XCTAssertTrue(HelpAssistant.solution(for: "voice not speaking in telugu").contains("Voice help"))
     }
 
+    func testDailyFoodPrices() {
+        XCTAssertEqual(DailyFoodPrices.plans.count, 7)
+        XCTAssertTrue(DailyFoodPrices.plans.allSatisfy { !$0.items.isEmpty })
+        let totals = DailyFoodPrices.totals(for: DailyFoodPrices.plans[0])
+        XCTAssertTrue(totals.calories > 1000 && totals.protein > 50)
+        XCTAssertEqual(DailyFoodPrices.prices.first { $0.foodName == "Eggs" }?.indicativePrice, 5.7)
+        XCTAssertEqual(DailyFoodPrices.prices.first { $0.foodName == "Chicken breast" }?.indicativePrice, 220)
+        XCTAssertEqual(DailyFoodPrices.prices.first { $0.foodName == "Dal (toor)" }?.indicativePrice, 115)
+    }
+
     func testPhotoFoodCalculation() {
         // Photo food logging: user confirms food + grams, app calculates macros.
         let rice = FoodDatabase.all.first { $0.name == "Cooked rice" }!
