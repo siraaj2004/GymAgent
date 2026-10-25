@@ -289,7 +289,7 @@ struct FoodView: View {
         let e = FoodEntry(); e.meal = meal; e.foodName = item.name; e.grams = item.grams
         e.calories = item.calories; e.protein = item.protein; e.carbs = item.carbs; e.fat = item.fat; e.fibre = item.fibre
         context.insert(e); try? context.save()
-        lastAdded = "✓ Added \(item.name) — \(Int(item.calories)) kcal, \(item.protein, specifier: "%.1f") g protein"
+        lastAdded = "✓ Added \(item.name) — \(Int(item.calories)) kcal, \(String(format: "%.1f", item.protein)) g protein"
     }
 }
 
