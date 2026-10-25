@@ -116,6 +116,9 @@ struct WorkoutView: View {
                     Text("You have done \(completed.count) of \(day.exercises.count) exercises.")
                         .font(.headline).foregroundColor(GymTheme.accent)
                     ProgressBar(value: Double(completed.count), total: Double(day.exercises.count))
+                    if completed.count == day.exercises.count && !day.exercises.isEmpty {
+                        Text("🎉 Well done! You finished today's workout.").font(.headline).foregroundColor(GymTheme.accent)
+                    }
                     Button(session == nil ? "Start this workout" : "End workout & save") {
                         if session == nil {
                             let s = WorkoutSessionRecord(); s.dayNumber = day.day; s.dayTitle = day.title; context.insert(s); session = s
@@ -123,7 +126,7 @@ struct WorkoutView: View {
                             session?.endedAt = Date(); session?.isComplete = true
                             try? context.save(); NotificationManager.completionMessage(); session = nil
                         }
-                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
                     Button("Stop — sharp pain / dizziness / numbness", role: .destructive) { painAlert = true }
                     // Segregated by time block, exactly as in the PDF. Block minutes
                     // are prescribed; per-exercise minutes are estimates (shown with ~).
@@ -150,7 +153,7 @@ struct WorkoutView: View {
                                                         if let s = session {
                                                             let r = SetRecord(); r.exerciseName = ex.name; r.setIndex = 1; r.reps = 10; context.insert(r); s.sets.append(r); try? context.save()
                                                         }
-                                                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                                                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
                                                     NavigationLink("AI Coach") { AICoachView(exerciseName: ex.name) }
                                                 }
                                             }
@@ -181,15 +184,21 @@ struct FoodView: View {
     @State private var meal = "Breakfast"
     @State private var waterMl = 0
     @State private var showPhotoFood = false
+    @State private var lastAdded = ""
     var body: some View {
         NavigationStack {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Food").font(.largeTitle).bold()
                 Button("📸 Log food by photo →") { showPhotoFood = true }
-                    .buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                    .buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
                     .sheet(isPresented: $showPhotoFood) { PhotoFoodView() }
+                if !lastAdded.isEmpty {
+                    Text(lastAdded).font(.headline).foregroundColor(GymTheme.accent)
+                }
                 NavigationLink("Low-price nutrition for my weight & height →") { LowPriceNutritionView() }
+                    .buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                NavigationLink("Daily food & Guntur / Hyderabad prices →") { DailyFoodPricesView() }
                     .buttonStyle(.borderedProminent).tint(GymTheme.accent)
                 if let p = profiles.first {
                     let t = NutritionCalculator.calculate(age: p.age, weightKg: p.weightKg, heightCm: p.heightCm, sex: p.sex, activityLevel: p.activityLevel, goal: p.goal)
@@ -224,6 +233,7 @@ struct FoodView: View {
                                 let e = FoodEntry(); e.meal = meal; e.foodName = item.name; e.grams = item.grams
                                 e.calories = item.calories; e.protein = item.protein; e.carbs = item.carbs; e.fat = item.fat; e.fibre = item.fibre
                                 context.insert(e); try? context.save()
+                                lastAdded = "✓ Added \(item.name) — \(Int(item.calories)) kcal, \(item.protein, specifier: "%.1f") g protein"
                             }
                         }
                     }
