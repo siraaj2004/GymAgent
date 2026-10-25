@@ -187,88 +187,109 @@ struct FoodView: View {
     @State private var lastAdded = ""
     var body: some View {
         NavigationStack {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Food").font(.largeTitle).bold()
-                Button("📸 Log food by photo →") { showPhotoFood = true }
-                    .buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
-                    .sheet(isPresented: $showPhotoFood) { PhotoFoodView() }
-                if !lastAdded.isEmpty {
-                    Text(lastAdded).font(.headline).foregroundColor(GymTheme.accent)
-                }
-                NavigationLink("Low-price nutrition for my weight & height →") { LowPriceNutritionView() }
-                    .buttonStyle(.borderedProminent).tint(GymTheme.accent)
-                NavigationLink("Daily food & Guntur / Hyderabad prices →") { DailyFoodPricesView() }
-                    .buttonStyle(.borderedProminent).tint(GymTheme.accent)
-                if let p = profiles.first {
-                    let t = NutritionCalculator.calculate(age: p.age, weightKg: p.weightKg, heightCm: p.heightCm, sex: p.sex, activityLevel: p.activityLevel, goal: p.goal)
-                    let today = foods.filter { Calendar.current.isDateInToday($0.date) }
-                    let cal = today.reduce(0) { $0 + $1.calories }; let prot = today.reduce(0) { $0 + $1.protein }
-                    let carb = today.reduce(0) { $0 + $1.carbs }; let fat = today.reduce(0) { $0 + $1.fat }; let fib = today.reduce(0) { $0 + $1.fibre }
-                    GymCard {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Today: \(Int(cal)) / \(Int(t.calories)) kcal · Protein \(Int(prot)) / \(Int(t.protein)) g · Carbs \(Int(carb)) / \(Int(t.carbs)) g · Fat \(Int(fat)) / \(Int(t.fat)) g · Fibre \(Int(fib)) / \(Int(t.fibre)) g")
-                            Text("Remaining protein: \(Int(max(0, t.protein - prot))) g")
-                        }
-                    }
-                    GymCard {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("AI suggestions for remaining targets").font(.headline)
-                            ForEach(FoodDatabase.suggestions(remainingProtein: t.protein - prot, remainingCalories: t.calories - cal, vegetarianOnly: vegOnly)) { f in
-                                Text("\(f.name) — \(f.serving): \(Int(f.calories)) kcal, \(f.protein, specifier: "%.0f") g protein")
-                            }
-                            Text("Values are estimates for the stated serving. Confirm or correct food and quantity before saving. Photo suggestions are suggestions only, never exact nutrition from a photo.").font(.caption).foregroundColor(GymTheme.secondaryText)
-                        }
-                    }
-                }
-                TextField("Search food (rice, chapati, chicken, dal…)", text: $query).textFieldStyle(.roundedBorder)
-                Toggle("Vegetarian only", isOn: $vegOnly)
-                Picker("Meal", selection: $meal) { ForEach(["Breakfast", "Lunch", "Dinner", "Snacks"], id: \.self) { Text($0) } }.pickerStyle(.segmented)
-                ForEach(FoodDatabase.search(query, vegetarianOnly: vegOnly)) { item in
-                    GymCard {
-                        HStack {
-                            VStack(alignment: .leading) { Text(item.name).font(.headline); Text("\(item.serving): \(Int(item.calories)) kcal, \(item.protein, specifier: "%.0f") g protein") }
-                            Spacer()
-                            Button("Add") {
-                                let e = FoodEntry(); e.meal = meal; e.foodName = item.name; e.grams = item.grams
-                                e.calories = item.calories; e.protein = item.protein; e.carbs = item.carbs; e.fat = item.fat; e.fibre = item.fibre
-                                context.insert(e); try? context.save()
-                                lastAdded = "✓ Added \(item.name) — \(Int(item.calories)) kcal, \(item.protein, specifier: "%.1f") g protein"
-                            }
-                        }
-                    }
-                }
-                GymCard {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Water").font(.headline)
-                        Text("\(waterMl) ml today (this session counter; add a WaterEntry in code for persistence)")
-                        Button("Add 250 ml") { waterMl += 250; let w = WaterEntry(); w.millilitres = 250; context.insert(w); try? context.save() }
-                    }
-                }
-                GymCard {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Today's food").font(.headline)
-                        let todayEntries = foods.filter { Calendar.current.isDateInToday($0.date) }
-                        if todayEntries.isEmpty { Text("Nothing logged yet today. Tap 'Log food by photo' above, or search below.").foregroundColor(GymTheme.secondaryText) }
-                        ForEach(todayEntries) { e in
-                            HStack {
-                                if let data = e.photoData, let img = UIImage(data: data) {
-                                    Image(uiImage: img).resizable().scaledToFill().frame(width: 40, height: 40).cornerRadius(8)
-                                }
-                                VStack(alignment: .leading) {
-                                    Text(e.foodName).font(.headline)
-                                    Text("\(e.meal) · \(Int(e.grams)) g: \(Int(e.calories)) kcal, \(e.protein, specifier: "%.1f") g protein, \(e.carbs, specifier: "%.1f") g carbs")
-                                }
-                                Spacer()
-                                Button("Delete") { context.delete(e); try? context.save() }.foregroundColor(.red)
-                            }
-                        }
-                    }
-                }
-                Text("Photo food logging tries automatic detection on-device with Apple's built-in classifier, shows its label + confidence, and you confirm the food — then it calculates macros from the confirmed food and grams. Detection is a guess for Indian foods, so always confirm before saving.").font(.caption).foregroundColor(GymTheme.secondaryText)
-            }.padding()
-        }.background(GymTheme.background)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    headerView
+                    todaySummaryView
+                    searchView
+                    waterView
+                    todaysFoodView
+                    Text("Photo food logging tries automatic detection on-device with Apple's built-in classifier, shows its label + confidence, and you confirm the food — then it calculates macros from the confirmed food and grams. Detection is a guess for Indian foods, so always confirm before saving.").font(.caption).foregroundColor(GymTheme.secondaryText)
+                }.padding()
+            }.background(GymTheme.background)
         }
+    }
+    @ViewBuilder private var headerView: some View {
+        Text("Food").font(.largeTitle).bold()
+        Button("📸 Log food by photo →") { showPhotoFood = true }
+            .buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
+            .sheet(isPresented: $showPhotoFood) { PhotoFoodView() }
+        if !lastAdded.isEmpty {
+            Text(lastAdded).font(.headline).foregroundColor(GymTheme.accent)
+        }
+        NavigationLink("Low-price nutrition for my weight & height →") { LowPriceNutritionView() }
+            .buttonStyle(.borderedProminent).tint(GymTheme.accent)
+        NavigationLink("Daily food & Guntur / Hyderabad prices →") { DailyFoodPricesView() }
+            .buttonStyle(.borderedProminent).tint(GymTheme.accent)
+    }
+    @ViewBuilder private var todaySummaryView: some View {
+        if let p = profiles.first {
+            let t = NutritionCalculator.calculate(age: p.age, weightKg: p.weightKg, heightCm: p.heightCm, sex: p.sex, activityLevel: p.activityLevel, goal: p.goal)
+            let today = foods.filter { Calendar.current.isDateInToday($0.date) }
+            let totals = todayTotals(today)
+            GymCard {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Today: \(Int(totals.cal)) / \(Int(t.calories)) kcal · Protein \(Int(totals.prot)) / \(Int(t.protein)) g · Carbs \(Int(totals.carb)) / \(Int(t.carbs)) g · Fat \(Int(totals.fat)) / \(Int(t.fat)) g · Fibre \(Int(totals.fib)) / \(Int(t.fibre)) g")
+                    Text("Remaining protein: \(Int(max(0, t.protein - totals.prot))) g")
+                }
+            }
+            GymCard {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("AI suggestions for remaining targets").font(.headline)
+                    ForEach(FoodDatabase.suggestions(remainingProtein: t.protein - totals.prot, remainingCalories: t.calories - totals.cal, vegetarianOnly: vegOnly)) { f in
+                        Text("\(f.name) — \(f.serving): \(Int(f.calories)) kcal, \(f.protein, specifier: "%.0f") g protein")
+                    }
+                    Text("Values are estimates for the stated serving. Confirm or correct food and quantity before saving. Photo suggestions are suggestions only, never exact nutrition from a photo.").font(.caption).foregroundColor(GymTheme.secondaryText)
+                }
+            }
+        }
+    }
+    @ViewBuilder private var searchView: some View {
+        TextField("Search food (rice, chapati, chicken, dal…)", text: $query).textFieldStyle(.roundedBorder)
+        Toggle("Vegetarian only", isOn: $vegOnly)
+        Picker("Meal", selection: $meal) { ForEach(["Breakfast", "Lunch", "Dinner", "Snacks"], id: \.self) { Text($0) } }.pickerStyle(.segmented)
+        ForEach(FoodDatabase.search(query, vegetarianOnly: vegOnly)) { item in
+            GymCard {
+                HStack {
+                    VStack(alignment: .leading) { Text(item.name).font(.headline); Text("\(item.serving): \(Int(item.calories)) kcal, \(item.protein, specifier: "%.0f") g protein") }
+                    Spacer()
+                    Button("Add") { addFood(item) }
+                }
+            }
+        }
+    }
+    @ViewBuilder private var waterView: some View {
+        GymCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Water").font(.headline)
+                Text("\(waterMl) ml today (this session counter; add a WaterEntry in code for persistence)")
+                Button("Add 250 ml") { waterMl += 250; let w = WaterEntry(); w.millilitres = 250; context.insert(w); try? context.save() }
+            }
+        }
+    }
+    @ViewBuilder private var todaysFoodView: some View {
+        GymCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Today's food").font(.headline)
+                let todayEntries = foods.filter { Calendar.current.isDateInToday($0.date) }
+                if todayEntries.isEmpty { Text("Nothing logged yet today. Tap 'Log food by photo' above, or search below.").foregroundColor(GymTheme.secondaryText) }
+                ForEach(todayEntries) { e in foodEntryRow(e) }
+            }
+        }
+    }
+    private func foodEntryRow(_ e: FoodEntry) -> some View {
+        HStack {
+            if let data = e.photoData, let img = UIImage(data: data) {
+                Image(uiImage: img).resizable().scaledToFill().frame(width: 40, height: 40).cornerRadius(8)
+            }
+            VStack(alignment: .leading) {
+                Text(e.foodName).font(.headline)
+                Text("\(e.meal) · \(Int(e.grams)) g: \(Int(e.calories)) kcal, \(e.protein, specifier: "%.1f") g protein, \(e.carbs, specifier: "%.1f") g carbs")
+            }
+            Spacer()
+            Button("Delete") { context.delete(e); try? context.save() }.foregroundColor(.red)
+        }
+    }
+    private func todayTotals(_ today: [FoodEntry]) -> (cal: Double, prot: Double, carb: Double, fat: Double, fib: Double) {
+        var cal = 0.0, prot = 0.0, carb = 0.0, fat = 0.0, fib = 0.0
+        for e in today { cal += e.calories; prot += e.protein; carb += e.carbs; fat += e.fat; fib += e.fibre }
+        return (cal, prot, carb, fat, fib)
+    }
+    private func addFood(_ item: FoodItem) {
+        let e = FoodEntry(); e.meal = meal; e.foodName = item.name; e.grams = item.grams
+        e.calories = item.calories; e.protein = item.protein; e.carbs = item.carbs; e.fat = item.fat; e.fibre = item.fibre
+        context.insert(e); try? context.save()
+        lastAdded = "✓ Added \(item.name) — \(Int(item.calories)) kcal, \(item.protein, specifier: "%.1f") g protein"
     }
 }
 
