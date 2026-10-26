@@ -168,4 +168,37 @@ final class GymAITests: XCTestCase {
         XCTAssertEqual(CoachCamera.position(forFront: true), .front)
         XCTAssertEqual(CoachCamera.position(forFront: false), .back)
     }
+
+    private func squatFrame(ankleX: Double, ankleY: Double) -> PoseFrame {
+        var pts: [String: PosePoint] = [:]
+        pts["lHip"] = PosePoint(x: 0, y: 0, confidence: 1)
+        pts["lKnee"] = PosePoint(x: 1, y: 0, confidence: 1)
+        pts["lAnkle"] = PosePoint(x: ankleX, y: ankleY, confidence: 1)
+        for name in ["lShoulder", "rShoulder", "rHip", "rKnee", "rAnkle", "lWrist"] {
+            pts[name] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        }
+        return PoseFrame(points: pts, required: ["lHip", "lKnee", "lAnkle"])
+    }
+
+    func testVoiceCorrectionForPartialSquatRep() {
+        let a = UniversalExerciseAnalyzer(exerciseName: "Back squat / hack squat")
+        _ = a.update(frame: squatFrame(ankleX: 1.985, ankleY: 0.174)) // ~170 deg, standing
+        _ = a.update(frame: squatFrame(ankleX: 1.643, ankleY: 0.766)) // ~130 deg, middle
+        let r = a.update(frame: squatFrame(ankleX: 1.985, ankleY: 0.174)) // back to standing, no depth reached
+        XCTAssertEqual(r.reps, 0)
+        XCTAssertTrue(r.isCorrection, "A half rep must speak the exercise correction, not stay silent")
+        XCTAssertEqual(r.feedback, "Keep your chest up, bend to good depth, stand up smoothly.")
+    }
+
+    func testVoiceCorrectionForArmRaiseTooHigh() {
+        let a = UniversalExerciseAnalyzer(exerciseName: "Cable lateral raise")
+        var pts: [String: PosePoint] = [:]
+        pts["lShoulder"] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        pts["lWrist"] = PosePoint(x: 0.5, y: 0.8, confidence: 1)
+        for name in ["lHip", "lKnee", "lAnkle", "rShoulder", "rHip", "rKnee", "rAnkle", "lElbow"] {
+            pts[name] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        }
+        let r = a.update(frame: PoseFrame(points: pts, required: ["lShoulder", "lWrist"]))
+        XCTAssertTrue(r.isCorrection)
+    }
 }
