@@ -18,6 +18,7 @@ struct AICoachView: View {
     @State private var isRunning = false
     @State private var assessable = true
     @State private var cameraDenied = false
+    @State private var useFrontCamera = true
 
     var body: some View {
         VStack(spacing: 16) {
@@ -25,7 +26,7 @@ struct AICoachView: View {
             Text(exerciseName).font(.headline)
             Text(PoseDetector.cameraGuidance(for: exerciseName)).foregroundColor(GymTheme.secondaryText)
             ZStack {
-                CameraPreviewView(onFrame: handleFrame)
+                CameraPreviewView(useFrontCamera: useFrontCamera, onFrame: handleFrame)
                     .frame(height: 320).cornerRadius(16)
                 if !assessable {
                     Text("Unable to assess").padding().background(Color.black.opacity(0.7)).cornerRadius(10)
@@ -43,6 +44,8 @@ struct AICoachView: View {
                 Button("+1 rep by hand") { reps += 1 }
                 Button("Finish") { isRunning = false; coach.stop() }
             }.buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
+            Button(useFrontCamera ? "Switch to back camera" : "Switch to front camera") { useFrontCamera.toggle() }
+                .buttonStyle(.bordered).tint(GymTheme.accent).controlSize(.large)
             HStack {
                 Toggle("Mute voice", isOn: $coach.isMuted)
                 Button("How many reps?") { coach.speak("You have done \(reps) repetitions.", language: profiles.first?.trainerLanguage ?? "English") }
@@ -81,16 +84,30 @@ struct AICoachView: View {
     }
 }
 
+/// Front camera by default (so you can see yourself while you train),
+/// with a switch to the back camera. Falls back to the other camera if
+/// the preferred one is not available on the device.
+enum CoachCamera {
+    static func position(forFront: Bool) -> AVCaptureDevice.Position { forFront ? .front : .back }
+    static func device(forFront: Bool) -> AVCaptureDevice? {
+        let preferred = position(forFront: forFront)
+        if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: preferred) { return device }
+        return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position(forFront: !forFront))
+    }
+}
+
 struct CameraPreviewView: UIViewRepresentable {
+    var useFrontCamera: Bool = true
     var onFrame: (VNHumanBodyPoseObservation) -> Void
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         let session = AVCaptureSession()
         session.sessionPreset = .high
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+        guard let device = CoachCamera.device(forFront: useFrontCamera),
               let input = try? AVCaptureDeviceInput(device: device),
               session.canAddInput(input) else { return view }
         session.addInput(input)
+        context.coordinator.currentPosition = device.position
         let output = AVCaptureVideoDataOutput()
         output.setSampleBufferDelegate(context.coordinator, queue: DispatchQueue(label: "gymai.camera"))
         session.addOutput(output)
@@ -103,13 +120,27 @@ struct CameraPreviewView: UIViewRepresentable {
     }
     func updateUIView(_ uiView: UIView, context: Context) {
         context.coordinator.layer?.frame = uiView.bounds
+        let wanted = CoachCamera.position(forFront: useFrontCamera)
+        if let session = context.coordinator.session, context.coordinator.currentPosition != wanted {
+            context.coordinator.switchCamera(to: wanted, session: session)
+        }
     }
     func makeCoordinator() -> Coordinator { Coordinator(onFrame: onFrame) }
     final class Coordinator: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         var onFrame: (VNHumanBodyPoseObservation) -> Void
         var session: AVCaptureSession?
         var layer: AVCaptureVideoPreviewLayer?
+        var currentPosition: AVCaptureDevice.Position?
         init(onFrame: @escaping (VNHumanBodyPoseObservation) -> Void) { self.onFrame = onFrame }
+        func switchCamera(to position: AVCaptureDevice.Position, session: AVCaptureSession) {
+            guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position),
+                  let input = try? AVCaptureDeviceInput(device: device) else { return }
+            session.beginConfiguration()
+            for old in session.inputs { session.removeInput(old) }
+            if session.canAddInput(input) { session.addInput(input); currentPosition = position }
+            session.commitConfiguration()
+            if !session.isRunning { session.startRunning() }
+        }
         func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
             guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
             let request = VNDetectHumanBodyPoseRequest()
