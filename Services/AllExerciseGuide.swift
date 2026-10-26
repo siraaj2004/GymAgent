@@ -159,6 +159,7 @@ final class UniversalExerciseAnalyzer {
     private(set) var reps = 0
     private var phase: String = "unknown" // "low", "high", or "unknown"
     private var firstExtreme: String?
+    private var attemptedPartial = false
     private var baseValue: Double?
     private(set) var holdSeconds: Double = 0
     private var holdStart: Date?
@@ -216,7 +217,9 @@ final class UniversalExerciseAnalyzer {
             return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: false, assessable: false, holdSeconds: 0)
         }
         guard frame.assessable else {
-            return AnalysisResult(reps: reps, feedback: "Unable to assess — move so the required joints are visible.", isCorrection: false, assessable: false, holdSeconds: holdSeconds)
+            // Wrong phone position / joints not visible IS a voice correction:
+            // the user cannot fix a position they are not told about.
+            return AnalysisResult(reps: reps, feedback: "Unable to assess — move so the required joints are visible.", isCorrection: true, assessable: false, holdSeconds: holdSeconds)
         }
         if guide.pattern == .bodyLineHold {
             guard let s = f_point(frame, "lShoulder"), let h = f_point(frame, "lHip"), let a = f_point(frame, "lAnkle") else {
@@ -232,18 +235,37 @@ final class UniversalExerciseAnalyzer {
             return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: holdSeconds)
         }
         guard let v = value(for: frame, guide: guide) else {
-            return AnalysisResult(reps: reps, feedback: "Unable to assess", isCorrection: false, assessable: false, holdSeconds: 0)
+            return AnalysisResult(reps: reps, feedback: "Unable to assess", isCorrection: true, assessable: false, holdSeconds: 0)
         }
         let low = guide.pattern == .verticalLift ? 0.005 : guide.low
         let high = guide.pattern == .verticalLift ? guide.liftDelta : guide.high
+        // Voice correction for a clearly wrong position (overshoot), for every
+        // exercise family where it is measurable: arm raised too high, or a
+        // joint bent far past the rep range. This is spoken by the caller.
+        if guide.pattern == .armHeight, v > high + 0.10 {
+            return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0)
+        }
+        if guide.pattern == .jointAngle, v < low - 30 {
+            return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0)
+        }
+        // Track a partial (half) rep attempt: moved from the starting extreme
+        // into the middle, then back to the same extreme without ever reaching
+        // the opposite extreme. That is a wrong / incomplete rep, not a counted
+        // rep — speak the exercise's correction for it.
+        if guide.pattern != .verticalLift, high > low, let first = firstExtreme {
+            let midLow = low + (high - low) * 0.25, midHigh = high - (high - low) * 0.25
+            if phase == first, v > midLow, v < midHigh { attemptedPartial = true }
+        }
         // Generic out-and-back: first extreme -> opposite extreme -> back to first = 1 rep.
         if v <= low {
             if firstExtreme == nil { firstExtreme = "low"; phase = "low" }
-            else if phase == "high", firstExtreme == "low" { reps += 1; phase = "low"; return AnalysisResult(reps: reps, feedback: "Good repetition!", isCorrection: false, assessable: true, holdSeconds: 0) }
+            else if phase == "high", firstExtreme == "low" { attemptedPartial = false; reps += 1; phase = "low"; return AnalysisResult(reps: reps, feedback: "Good repetition!", isCorrection: false, assessable: true, holdSeconds: 0) }
+            else if attemptedPartial, firstExtreme == "low", phase == "low" { attemptedPartial = false; return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0) }
             else { phase = "low" }
         } else if v >= high {
             if firstExtreme == nil { firstExtreme = "high"; phase = "high" }
-            else if phase == "low", firstExtreme == "high" { reps += 1; phase = "high"; return AnalysisResult(reps: reps, feedback: "Good repetition!", isCorrection: false, assessable: true, holdSeconds: 0) }
+            else if phase == "low", firstExtreme == "high" { attemptedPartial = false; reps += 1; phase = "high"; return AnalysisResult(reps: reps, feedback: "Good repetition!", isCorrection: false, assessable: true, holdSeconds: 0) }
+            else if attemptedPartial, firstExtreme == "high", phase == "high" { attemptedPartial = false; return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0) }
             else { phase = "high" }
         }
         // Asymmetry check for elbow/knee: left vs right angle differing a lot.
