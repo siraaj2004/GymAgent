@@ -21,40 +21,45 @@ struct AICoachView: View {
     @State private var useFrontCamera = true
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text("AI Coach").font(.largeTitle).bold()
-            Text(exerciseName).font(.headline)
-            Text(PoseDetector.cameraGuidance(for: exerciseName)).foregroundColor(GymTheme.secondaryText)
-            ZStack {
-                CameraPreviewView(useFrontCamera: useFrontCamera, onFrame: handleFrame)
-                    .frame(height: 320).cornerRadius(16)
-                if !assessable {
-                    Text("Unable to assess").padding().background(Color.black.opacity(0.7)).cornerRadius(10)
-                }
-            }
-            Text("Reps: \(reps)").font(.system(size: 48, weight: .bold)).foregroundColor(GymTheme.accent)
-            Text(feedback).multilineTextAlignment(.center)
-            // Honest per-exercise limits: what the camera checks, and what it cannot check.
-            if let guide = analyzer?.guide {
-                Text("Camera checks: \(guide.checks)").font(.caption).foregroundColor(GymTheme.secondaryText).multilineTextAlignment(.center)
-                Text("Camera cannot check: \(guide.cannotCheck)").font(.caption).foregroundColor(.yellow).multilineTextAlignment(.center)
-            }
-            HStack {
-                Button(isRunning ? "Pause" : "Start camera") { isRunning.toggle() }
-                Button("+1 rep by hand") { reps += 1 }
-                Button("Finish") { isRunning = false; coach.stop() }
-            }.buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
-            Button(useFrontCamera ? "Switch to back camera" : "Switch to front camera") { useFrontCamera.toggle() }
-                .buttonStyle(.bordered).tint(GymTheme.accent).controlSize(.large)
-            HStack {
-                Toggle("Mute voice", isOn: $coach.isMuted)
-                Button("How many reps?") { coach.speak("You have done \(reps) repetitions.", language: profiles.first?.trainerLanguage ?? "English") }
-            }
-            Text("Safety: camera analysis cannot detect every error. A movement is never called safe just because no error was detected. For heavy lifts, feedback is conservative. Stop for sharp pain, dizziness or numbness.")
-                .font(.caption).foregroundColor(GymTheme.secondaryText)
-            if cameraDenied { Text("Camera permission was denied. Allow Camera in iPhone Settings > GYM AI, or use manual counting.").foregroundColor(.red) }
-            Spacer()
-        }.padding().background(GymTheme.background)
+        ZStack {
+            // Full-screen camera: the preview fills the whole screen, not
+            // a small 320-point box in the middle.
+            CameraPreviewView(useFrontCamera: useFrontCamera, onFrame: handleFrame)
+                .ignoresSafeArea()
+            VStack(spacing: 12) {
+                VStack(spacing: 4) {
+                    Text(exerciseName).font(.headline)
+                    Text(PoseDetector.cameraGuidance(for: exerciseName)).font(.caption).foregroundColor(.white)
+                    if !assessable {
+                        Text("Unable to assess").padding().background(Color.black.opacity(0.7)).cornerRadius(10)
+                    }
+                }.padding().background(Color.black.opacity(0.55)).cornerRadius(12)
+                Spacer()
+                VStack(spacing: 10) {
+                    Text("Reps: \(reps)").font(.system(size: 48, weight: .bold)).foregroundColor(GymTheme.accent)
+                    Text(feedback).multilineTextAlignment(.center)
+                    // Honest per-exercise limits: what the camera checks, and what it cannot check.
+                    if let guide = analyzer?.guide {
+                        Text("Camera checks: \(guide.checks)").font(.caption).foregroundColor(.white).multilineTextAlignment(.center)
+                        Text("Camera cannot check: \(guide.cannotCheck)").font(.caption).foregroundColor(.yellow).multilineTextAlignment(.center)
+                    }
+                    HStack {
+                        Button(isRunning ? "Pause" : "Start camera") { isRunning.toggle() }
+                        Button("+1 rep by hand") { reps += 1 }
+                        Button("Finish") { isRunning = false; coach.stop() }
+                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
+                    Button(useFrontCamera ? "Switch to back camera" : "Switch to front camera") { useFrontCamera.toggle() }
+                        .buttonStyle(.bordered).tint(GymTheme.accent).controlSize(.large)
+                    HStack {
+                        Toggle("Mute voice", isOn: $coach.isMuted)
+                        Button("How many reps?") { coach.speak("You have done \(reps) repetitions.", language: profiles.first?.trainerLanguage ?? "English") }
+                    }
+                    Text("Safety: camera analysis cannot detect every error. A movement is never called safe just because no error was detected. For heavy lifts, feedback is conservative. Stop for sharp pain, dizziness or numbness.")
+                        .font(.caption).foregroundColor(.white)
+                    if cameraDenied { Text("Camera permission was denied. Allow Camera in iPhone Settings > GYM AI, or use manual counting.").foregroundColor(.red) }
+                }.padding().background(Color.black.opacity(0.55)).cornerRadius(16)
+            }.padding()
+        }
         .onAppear { analyzer = UniversalExerciseAnalyzer(exerciseName: exerciseName) }
         .onChange(of: exerciseName) { analyzer = UniversalExerciseAnalyzer(exerciseName: $0) }
     }
