@@ -1,4 +1,5 @@
 import XCTest
+import AVFoundation
 @testable import GymAI
 
 final class GymAITests: XCTestCase {
@@ -161,5 +162,10 @@ final class GymAITests: XCTestCase {
         var comps = DateComponents(); comps.year = 2026; comps.month = 10; comps.day = 26
         let monday = Calendar.current.date(from: comps)!
         XCTAssertEqual(WorkoutPlanStore.dayForDate(monday), 1)
+    }
+
+    func testCoachCameraDefaultsToFront() {
+        XCTAssertEqual(CoachCamera.position(forFront: true), .front)
+        XCTAssertEqual(CoachCamera.position(forFront: false), .back)
     }
 }
