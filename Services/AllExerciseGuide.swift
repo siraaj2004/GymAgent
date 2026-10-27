@@ -248,6 +248,14 @@ final class UniversalExerciseAnalyzer {
         if guide.pattern == .jointAngle, v < low - 30 {
             return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0)
         }
+        // Same overshoot idea for distance movements: arms / legs opened far
+        // wider than the rep range is a wrong position, not a better rep.
+        if guide.pattern == .wristDistance, v > high + 0.10 {
+            return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0)
+        }
+        if guide.pattern == .ankleDistance, v > high + 0.10 {
+            return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0)
+        }
         // Track a partial (half) rep attempt: moved from the starting extreme
         // into the middle, then back to the same extreme without ever reaching
         // the opposite extreme. That is a wrong / incomplete rep, not a counted
@@ -268,19 +276,29 @@ final class UniversalExerciseAnalyzer {
             else if attemptedPartial, firstExtreme == "high", phase == "high" { attemptedPartial = false; return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: true, assessable: true, holdSeconds: 0) }
             else { phase = "high" }
         }
-        // Asymmetry check for elbow/knee: left vs right angle differing a lot.
-        if guide.joint == "elbow" || guide.joint == "knee" {
+        // Asymmetry check for elbow/knee/hip: left vs right angle differing a lot.
+        if guide.joint == "elbow" || guide.joint == "knee" || guide.joint == "hip" {
             let left = jointAngle(frame, joint: guide.joint)
             let right: Double? = {
                 if guide.joint == "elbow" {
                     guard let s = frame.point("rShoulder"), let e = frame.point("rElbow"), let w = frame.point("rWrist") else { return nil }
                     return Self.angle(a: s, b: e, c: w)
+                } else if guide.joint == "hip" {
+                    guard let s = frame.point("rShoulder"), let h = frame.point("rHip"), let k = frame.point("rKnee") else { return nil }
+                    return Self.angle(a: s, b: h, c: k)
                 } else {
                     guard let h = frame.point("rHip"), let k = frame.point("rKnee"), let a = frame.point("rAnkle") else { return nil }
                     return Self.angle(a: h, b: k, c: a)
                 }
             }()
             if let l = left, let r = right, abs(l - r) > 25 {
+                return AnalysisResult(reps: reps, feedback: "Keep both sides even.", isCorrection: true, assessable: true, holdSeconds: 0)
+            }
+        }
+        // Asymmetry for raises: one arm much higher than the other.
+        if guide.pattern == .armHeight {
+            if let rs = frame.point("rShoulder"), let rw = frame.point("rWrist"),
+               abs(v - (rw.y - rs.y)) > 0.10 {
                 return AnalysisResult(reps: reps, feedback: "Keep both sides even.", isCorrection: true, assessable: true, holdSeconds: 0)
             }
         }
