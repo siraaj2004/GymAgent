@@ -1,7 +1,20 @@
 import SwiftUI
 import PhotosUI
 import AVFoundation
+import AVKit
 import Vision
+import UniformTypeIdentifiers
+
+/// PhotosPicker transferable for a picked video file. A bare URL is not
+/// Transferable, so the picker needs this wrapper around the file URL.
+struct VideoFile: Transferable {
+    let url: URL
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(contentType: .movie) { $0.url } importing: { received in
+            VideoFile(url: received.file)
+        }
+    }
+}
 
 /// How often to sample a video: about 10 frames per second is enough for
 /// rep counting and keeps a long gym video fast to analyse.
@@ -17,6 +30,13 @@ enum VideoFrameSampler {
 
 /// Plain-words verdict from a finished video analysis. Pure, so it is tested.
 enum VideoFormVerdict {
+    /// Explicit CORRECT / WRONG label, as asked: correct only when joints were
+    /// visible for most of the video and wrong-form frames were under 20%.
+    static func formLabel(assessableShare: Double, correctionShare: Double) -> String {
+        if assessableShare < 0.5 { return "FORM: CANNOT TELL" }
+        if correctionShare < 0.2 { return "FORM: CORRECT ✓" }
+        return "FORM: WRONG ✗"
+    }
     static func text(assessableShare: Double, correctionShare: Double) -> String {
         if assessableShare < 0.5 {
             return "Too much of you was out of frame — re-record with the required joints visible, then check again."
@@ -67,8 +87,8 @@ struct VideoFormCheckView: View {
                     .onChange(of: pickerItem) { _, item in
                         guard let item else { return }
                         Task {
-                            if let url = try? await item.loadTransferable(type: URL.self) {
-                                videoURL = url; hasResult = false
+                            if let file = try? await item.loadTransferable(type: VideoFile.self) {
+                                videoURL = file.url; hasResult = false
                                 status = "Video picked. Choose the exercise, then tap Analyse video."
                             } else {
                                 status = "Could not read that video. Try a video from your photo library."
@@ -90,6 +110,9 @@ struct VideoFormCheckView: View {
                     } else if hasResult {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Result: \(exerciseName)").font(.headline)
+                            Text(VideoFormVerdict.formLabel(assessableShare: assessableShare, correctionShare: correctionShare))
+                                .font(.title2.bold())
+                                .foregroundStyle(VideoFormVerdict.formLabel(assessableShare: assessableShare, correctionShare: correctionShare).contains("CORRECT") ? Color.green : VideoFormVerdict.formLabel(assessableShare: assessableShare, correctionShare: correctionShare).contains("WRONG") ? Color.red : Color.gray)
                             Text("Reps counted: \(reps)").font(.title3.bold())
                             Text("Joints visible: \(Int(assessableShare * 100))% of checked frames")
                             Text("Wrong-form frames: \(Int(correctionShare * 100))%")
@@ -128,7 +151,8 @@ struct VideoFormCheckView: View {
         isAnalysing = true; hasResult = false; progress = 0
         status = "Analysing… this runs on your phone, frame by frame."
         let name = exerciseName
-        Task.detached(priority: .userInitiated) {
+        let required = requiredJoints(for: AllExerciseGuide.guide(for: name))
+        Task.detached(priority: .userInitiated) { [videoURL, name, required] in
             let asset = AVAsset(url: videoURL)
             guard let track = try? await asset.loadTracks(withMediaType: .video).first else {
                 await MainActor.run { self.status = "No video track found in that file."; self.isAnalysing = false }
@@ -136,7 +160,7 @@ struct VideoFormCheckView: View {
             }
             let fps = (try? await track.load(.nominalFrameRate)) ?? 30
             let interval = VideoFrameSampler.interval(nominalFPS: fps)
-            let duration = (try? await asset.load(.duration)).seconds ?? 0
+            let duration = (try? await asset.load(.duration))?.seconds ?? 0
             let expected = VideoFrameSampler.estimatedSamples(durationSeconds: duration)
             guard let reader = try? AVAssetReader(asset: asset) else {
                 await MainActor.run { self.status = "Could not read that video."; self.isAnalysing = false }
@@ -146,7 +170,6 @@ struct VideoFormCheckView: View {
             reader.add(output)
             reader.startReading()
             let analyzer = UniversalExerciseAnalyzer(exerciseName: name)
-            let required = self.requiredJoints(for: analyzer.guide)
             var index = 0, checked = 0, assessable = 0, correctionsCount = 0
             var seen: [String] = []
             while let sample = output.copyNextSampleBuffer() {
