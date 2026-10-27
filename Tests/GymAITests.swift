@@ -190,6 +190,21 @@ final class GymAITests: XCTestCase {
         XCTAssertEqual(r.feedback, "Keep your chest up, bend to good depth, stand up smoothly.")
     }
 
+    func testCompactRepPanelTargetReps() {
+        XCTAssertEqual(CoachTargetReps.target(from: "6-8"), 8)
+        XCTAssertEqual(CoachTargetReps.target(from: "12-15"), 15)
+        XCTAssertEqual(CoachTargetReps.target(from: "10"), 10)
+        XCTAssertNil(CoachTargetReps.target(from: ""))
+    }
+
+    func testCompactRepPanelFormStatus() {
+        XCTAssertEqual(CoachFormStatus.status(isRunning: false, assessable: true, isCorrection: false, feedback: ""), .notDetected)
+        XCTAssertEqual(CoachFormStatus.status(isRunning: true, assessable: false, isCorrection: false, feedback: ""), .notDetected)
+        XCTAssertEqual(CoachFormStatus.status(isRunning: true, assessable: true, isCorrection: true, feedback: "Keep your chest up"), .correction)
+        XCTAssertEqual(CoachFormStatus.status(isRunning: true, assessable: true, isCorrection: false, feedback: "Good repetition!"), .good)
+        XCTAssertEqual(CoachFormStatus.status(isRunning: true, assessable: true, isCorrection: false, feedback: "Stop for sharp pain"), .stop)
+    }
+
     func testVoiceCorrectionForArmRaiseTooHigh() {
         let a = UniversalExerciseAnalyzer(exerciseName: "Cable lateral raise")
         var pts: [String: PosePoint] = [:]
