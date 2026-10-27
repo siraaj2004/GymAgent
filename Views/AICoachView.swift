@@ -72,6 +72,10 @@ struct AICoachView: View {
     @State private var feedbackVisible = false
     @State private var feedbackToken = 0
     @State private var setAlreadySaved = false
+    // UI debounce for "Unable to assess": hold the last good feedback for
+    // up to 3 consecutive unassessable frames, so a brief occlusion does not
+    // flicker the screen between GOOD / NOT DETECTED / CORRECTION.
+    @State private var unassessableStreak = 0
 
     private var targetReps: Int? {
         planStore.plan.days.flatMap { $0.exercises }.first { $0.name == exerciseName }
@@ -247,14 +251,35 @@ struct AICoachView: View {
         let result = analyzer.update(frame: frame)
         DispatchQueue.main.async {
             let increased = result.reps > self.reps
+            // Hold the last good UI state through brief dropouts.
+            if !result.assessable {
+                self.unassessableStreak += 1
+                if self.unassessableStreak < 3 {
+                    // Still count a rep if one arrived, but do not flip the
+                    // screen or the voice to "Unable to assess" yet.
+                    self.reps = result.reps
+                    if result.isCorrection { coach.playWrongBeep() }
+                    return
+                }
+            } else {
+                self.unassessableStreak = 0
+            }
             self.reps = result.reps; self.feedback = result.feedback; self.assessable = result.assessable
             self.isCorrection = result.isCorrection
             let language = self.profiles.first?.trainerLanguage ?? "English"
-            if result.isCorrection { coach.speakCorrection(result.feedback, language: language) }
-            else if increased, let target = self.targetReps, result.reps >= target {
-                coach.speakCorrection("Set complete.", language: language)
+            if result.isCorrection {
+                // Wrong position: loud beep + spoken correction for THIS
+                // exercise (its own correction text, not a shared one).
+                coach.playWrongBeep()
+                coach.speakCorrection(result.feedback, language: language)
             }
-            else if result.feedback == "Good repetition!" { coach.speakCorrection("Good repetition!", language: language) }
+            else if increased, let target = self.targetReps, result.reps >= target {
+                coach.speakCorrection("Correct! Set complete.", language: language)
+            }
+            else if result.feedback == "Good repetition!" {
+                // Correct position, completed rep: say so plainly.
+                coach.speakCorrection("Correct! Good repetition!", language: language)
+            }
         }
     }
 }
