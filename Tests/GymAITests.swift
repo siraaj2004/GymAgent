@@ -282,6 +282,9 @@ final class GymAITests: XCTestCase {
         XCTAssertTrue(VideoFormVerdict.text(assessableShare: 0.2, correctionShare: 0.1).contains("out of frame"))
         XCTAssertEqual(VideoFormVerdict.text(assessableShare: 0.9, correctionShare: 0.1), "Good form overall.")
         XCTAssertTrue(VideoFormVerdict.text(assessableShare: 0.9, correctionShare: 0.8).contains("needs work"))
+        XCTAssertEqual(VideoFormVerdict.formLabel(assessableShare: 0.9, correctionShare: 0.1), "FORM: CORRECT ✓")
+        XCTAssertEqual(VideoFormVerdict.formLabel(assessableShare: 0.9, correctionShare: 0.5), "FORM: WRONG ✗")
+        XCTAssertEqual(VideoFormVerdict.formLabel(assessableShare: 0.2, correctionShare: 0.1), "FORM: CANNOT TELL")
     }
 
     func testSkeletonOverlayMapping() {
