@@ -14,6 +14,7 @@ struct ContentView: View {
                 HomeView().tabItem { Label("Home", systemImage: "house") }
                 WorkoutView().tabItem { Label("Workout", systemImage: "dumbbell") }
                 AICoachView().tabItem { Label("AI Coach", systemImage: "camera") }
+                VideoFormCheckView().tabItem { Label("Video Check", systemImage: "video") }
                 FoodView().tabItem { Label("Food", systemImage: "fork.knife") }
                 ProgressViewTab().tabItem { Label("Progress", systemImage: "chart.bar") }
                 HelpChatView().tabItem { Label("Help", systemImage: "questionmark.circle") }
