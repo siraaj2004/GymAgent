@@ -274,6 +274,17 @@ final class GymAITests: XCTestCase {
         XCTAssertTrue(third.isCorrection, "Persistent joints-not-visible must be a spoken correction")
     }
 
+    func testSkeletonOverlayMapping() {
+        let p = PosePoint(x: 0.25, y: 0.75, confidence: 1)
+        let size = CGSize(width: 400, height: 800)
+        let normal = SkeletonPointMapper.position(for: p, size: size, mirrored: false)
+        XCTAssertEqual(normal.x, 100, accuracy: 0.01)
+        XCTAssertEqual(normal.y, 200, accuracy: 0.01, "Vision y grows up, screen y grows down, so y must flip")
+        let mirrored = SkeletonPointMapper.position(for: p, size: size, mirrored: true)
+        XCTAssertEqual(mirrored.x, 300, accuracy: 0.01, "Front camera preview is mirrored, so x must flip")
+        XCTAssertEqual(mirrored.y, 200, accuracy: 0.01)
+    }
+
     func testCompactRepPanelTargetReps() {
         XCTAssertEqual(CoachTargetReps.target(from: "6-8"), 8)
         XCTAssertEqual(CoachTargetReps.target(from: "12-15"), 15)
