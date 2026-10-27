@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 struct VideoFile: Transferable {
     let url: URL
     static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(contentType: .movie) { $0.url } importing: { received in
+        FileRepresentation(contentType: .movie) { SentTransferredFile($0.url) } importing: { received in
             VideoFile(url: received.file)
         }
     }
