@@ -190,6 +190,52 @@ final class GymAITests: XCTestCase {
         XCTAssertEqual(r.feedback, "Keep your chest up, bend to good depth, stand up smoothly.")
     }
 
+    func testWrongPositionForFlyAndAdductorTooWide() {
+        var pts: [String: PosePoint] = [:]
+        pts["lWrist"] = PosePoint(x: 0.2, y: 0.5, confidence: 1)
+        pts["rWrist"] = PosePoint(x: 0.75, y: 0.5, confidence: 1)
+        for name in ["lShoulder", "rShoulder", "lHip", "rHip", "lKnee", "rKnee", "lAnkle", "rAnkle"] {
+            pts[name] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        }
+        let fly = UniversalExerciseAnalyzer(exerciseName: "Cable fly")
+            .update(frame: PoseFrame(points: pts, required: ["lWrist", "rWrist"]))
+        XCTAssertTrue(fly.isCorrection, "Arms opened far wider than the fly range must be a voice correction")
+        pts["lAnkle"] = PosePoint(x: 0.2, y: 0.5, confidence: 1)
+        pts["rAnkle"] = PosePoint(x: 0.65, y: 0.5, confidence: 1)
+        let adductor = UniversalExerciseAnalyzer(exerciseName: "Adductor machine")
+            .update(frame: PoseFrame(points: pts, required: ["lAnkle", "rAnkle"]))
+        XCTAssertTrue(adductor.isCorrection, "Legs opened far wider than the adductor range must be a voice correction")
+    }
+
+    func testWrongPositionForHipAndRaiseAsymmetry() {
+        var pts: [String: PosePoint] = [:]
+        pts["lShoulder"] = PosePoint(x: 0, y: 2, confidence: 1)
+        pts["lHip"] = PosePoint(x: 0, y: 1, confidence: 1)
+        pts["lKnee"] = PosePoint(x: 0, y: 0, confidence: 1)
+        pts["rShoulder"] = PosePoint(x: 1, y: 0, confidence: 1)
+        pts["rHip"] = PosePoint(x: 0, y: 0, confidence: 1)
+        pts["rKnee"] = PosePoint(x: 0, y: 1, confidence: 1)
+        for name in ["lElbow", "lWrist", "rElbow", "rWrist"] {
+            pts[name] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        }
+        let hip = UniversalExerciseAnalyzer(exerciseName: "Romanian deadlift")
+            .update(frame: PoseFrame(points: pts, required: ["lShoulder", "lHip", "lKnee"]))
+        XCTAssertTrue(hip.isCorrection)
+        XCTAssertEqual(hip.feedback, "Keep both sides even.")
+        var raisePts: [String: PosePoint] = [:]
+        raisePts["lShoulder"] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        raisePts["lWrist"] = PosePoint(x: 0.5, y: 0.65, confidence: 1)
+        raisePts["rShoulder"] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        raisePts["rWrist"] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        for name in ["lHip", "lKnee", "lAnkle", "rHip", "rKnee", "rAnkle", "lElbow"] {
+            raisePts[name] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        }
+        let raise = UniversalExerciseAnalyzer(exerciseName: "Cable lateral raise")
+            .update(frame: PoseFrame(points: raisePts, required: ["lShoulder", "lWrist"]))
+        XCTAssertTrue(raise.isCorrection)
+        XCTAssertEqual(raise.feedback, "Keep both sides even.")
+    }
+
     func testCompactRepPanelTargetReps() {
         XCTAssertEqual(CoachTargetReps.target(from: "6-8"), 8)
         XCTAssertEqual(CoachTargetReps.target(from: "12-15"), 15)
