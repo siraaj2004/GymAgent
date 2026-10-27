@@ -116,7 +116,9 @@ enum AllExerciseGuide {
                                  correction: "Lift your shoulders straight up, pause, lower slowly. Do not roll.",
                                  camera: "Phone in front, shoulders visible.")
         }
-        // Elbow movements: presses, push-ups, curls, extensions, pulldowns, rows, face pulls.
+        // Elbow movements, each with its OWN correction text — not one shared
+        // message for every elbow exercise. Before this, curls, rows and
+        // pulldowns all spoke the same "Pull smoothly" line.
         if n.contains("press") || n.contains("push-up") || n.contains("push-ups") || n.contains("bench") || n.contains("extension") || n.contains("pushdown") || n.contains("punch") {
             return ExerciseGuide(pattern: .jointAngle, joint: "elbow", low: 90, high: 160, liftDelta: 0,
                                  checks: "Elbow bending and straightening, and both arms staying even.",
@@ -124,23 +126,103 @@ enum AllExerciseGuide {
                                  correction: "Press smoothly. Keep both arms even and lower under control.",
                                  camera: "Phone in front, shoulders, elbows and wrists visible.")
         }
-        if n.contains("curl") || n.contains("pull-up") || n.contains("pulldown") || n.contains("row") || n.contains("face pull") || n.contains("external rotation") || n.contains("rotation") {
+        // Curls get a lower "low" (50, not 70): from the front camera, a full
+        // curl's 2D elbow angle looks larger than the true angle, so 70 made
+        // real full curls look like half reps and triggered constant corrections.
+        if n.contains("curl") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "elbow", low: 50, high: 160, liftDelta: 0,
+                                 checks: "Elbow curling fully and lowering, both sides even.",
+                                 cannotCheck: "Weight, grip, or bicep effort.",
+                                 correction: "Curl smoothly, keep your elbows still at your sides, lower under control.",
+                                 camera: "Phone in front, upper body and arms fully visible.")
+        }
+        if n.contains("face pull") {
             return ExerciseGuide(pattern: .jointAngle, joint: "elbow", low: 70, high: 160, liftDelta: 0,
                                  checks: "Elbow bending and straightening, and both sides staying even.",
                                  cannotCheck: "Weight, grip, or back engagement.",
-                                 correction: "Pull smoothly, keep your elbows close, lower under control.",
+                                 correction: "Pull to your forehead, keep your elbows high, lower slowly.",
                                  camera: "Phone in front, upper body and arms fully visible.")
         }
-        // Knee movements: squats, lunges, leg press, leg extension, leg curl.
-        if n.contains("squat") || n.contains("lunge") || n.contains("leg press") || n.contains("leg extension") || n.contains("leg curl") || n.contains("split squat") {
+        if n.contains("pull-up") || n.contains("pulldown") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "elbow", low: 70, high: 160, liftDelta: 0,
+                                 checks: "Elbow bending and straightening, and both sides staying even.",
+                                 cannotCheck: "Weight, grip, or back engagement.",
+                                 correction: "Pull smoothly, keep your chest up, lower under control.",
+                                 camera: "Phone in front, upper body and arms fully visible.")
+        }
+        if n.contains("row") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "elbow", low: 70, high: 160, liftDelta: 0,
+                                 checks: "Elbow bending and straightening, and both sides staying even.",
+                                 cannotCheck: "Weight, grip, or back engagement.",
+                                 correction: "Row smoothly, keep your back flat, squeeze at the top.",
+                                 camera: "Phone in front, upper body and arms fully visible.")
+        }
+        if n.contains("external rotation") || n.contains("rotation") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "elbow", low: 70, high: 160, liftDelta: 0,
+                                 checks: "Elbow bending and straightening, and both sides staying even.",
+                                 cannotCheck: "Weight, grip, or back engagement.",
+                                 correction: "Rotate slowly, keep your elbow tucked, do not swing.",
+                                 camera: "Phone in front, upper body and arms fully visible.")
+        }
+        // Knee movements, each with its own correction.
+        if n.contains("lunge") || n.contains("split squat") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "knee", low: 100, high: 160, liftDelta: 0,
+                                 checks: "Knee bending and standing back up, both legs even.",
+                                 cannotCheck: "Weight, foot pressure, or knee tracking in 3D.",
+                                 correction: "Step steady, keep your front knee tracking forward, stand up smoothly.",
+                                 camera: "Phone to your side, full body in frame, knees and hips visible.")
+        }
+        if n.contains("leg extension") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "knee", low: 100, high: 160, liftDelta: 0,
+                                 checks: "Knee extending fully and lowering, both legs even.",
+                                 cannotCheck: "Weight, foot pressure, or knee tracking in 3D.",
+                                 correction: "Extend fully, lower slowly, keep your knees still.",
+                                 camera: "Phone to your side, full body in frame, knees and hips visible.")
+        }
+        if n.contains("leg curl") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "knee", low: 100, high: 160, liftDelta: 0,
+                                 checks: "Knee curling and lowering, both legs even.",
+                                 cannotCheck: "Weight, foot pressure, or knee tracking in 3D.",
+                                 correction: "Curl slowly, keep your hips down, lower under control.",
+                                 camera: "Phone to your side, full body in frame, knees and hips visible.")
+        }
+        if n.contains("squat") || n.contains("leg press") {
             return ExerciseGuide(pattern: .jointAngle, joint: "knee", low: 100, high: 160, liftDelta: 0,
                                  checks: "Knee bending to depth and standing back up, both legs even.",
                                  cannotCheck: "Weight, foot pressure, or knee tracking in 3D.",
                                  correction: "Keep your chest up, bend to good depth, stand up smoothly.",
                                  camera: "Phone to your side, full body in frame, knees and hips visible.")
         }
-        // Hip movements: deadlifts, hip thrusts, back extensions, crunches, leg raises, Pallof.
-        if n.contains("deadlift") || n.contains("good morning") || n.contains("hip thrust") || n.contains("glute bridge") || n.contains("back extension") || n.contains("reverse hyper") || n.contains("crunch") || n.contains("leg raise") || n.contains("pallof") {
+        // Hip movements, each with its own correction.
+        if n.contains("deadlift") || n.contains("good morning") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "hip", low: 100, high: 160, liftDelta: 0,
+                                 checks: "Hip bending and extending, and torso staying controlled.",
+                                 cannotCheck: "Weight, low-back load, or core bracing.",
+                                 correction: "Hinge slowly, keep your back flat, drive your hips forward.",
+                                 camera: "Phone to your side, hips and torso fully visible.")
+        }
+        if n.contains("hip thrust") || n.contains("glute bridge") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "hip", low: 100, high: 160, liftDelta: 0,
+                                 checks: "Hip extending fully and lowering, torso controlled.",
+                                 cannotCheck: "Weight, low-back load, or core bracing.",
+                                 correction: "Thrust fully, squeeze at the top, lower slowly.",
+                                 camera: "Phone to your side, hips and torso fully visible.")
+        }
+        if n.contains("crunch") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "hip", low: 100, high: 160, liftDelta: 0,
+                                 checks: "Torso crunching and lowering, controlled.",
+                                 cannotCheck: "Weight, low-back load, or core bracing.",
+                                 correction: "Crunch slowly, keep your neck relaxed, lower under control.",
+                                 camera: "Phone to your side, hips and torso fully visible.")
+        }
+        if n.contains("leg raise") {
+            return ExerciseGuide(pattern: .jointAngle, joint: "hip", low: 100, high: 160, liftDelta: 0,
+                                 checks: "Legs raising and lowering, torso controlled.",
+                                 cannotCheck: "Weight, low-back load, or core bracing.",
+                                 correction: "Raise slowly, keep your low back still, lower under control.",
+                                 camera: "Phone to your side, hips and torso fully visible.")
+        }
+        if n.contains("back extension") || n.contains("reverse hyper") || n.contains("pallof") {
             return ExerciseGuide(pattern: .jointAngle, joint: "hip", low: 100, high: 160, liftDelta: 0,
                                  checks: "Hip bending and extending, and torso staying controlled.",
                                  cannotCheck: "Weight, low-back load, or core bracing.",
@@ -163,6 +245,13 @@ final class UniversalExerciseAnalyzer {
     private var baseValue: Double?
     private(set) var holdSeconds: Double = 0
     private var holdStart: Date?
+    // "Unable to assess" debounce: a single dropped frame (dumbbell briefly
+    // covering a wrist, a person walking behind you, a bench edge) must not
+    // flip the screen and voice to a correction every time. Only the 3rd
+    // consecutive unassessable frame is a spoken correction; earlier ones
+    // still report assessable=false so the UI can hold its last good state,
+    // but with isCorrection=false so the voice stays quiet.
+    private var unassessableStreak = 0
 
     init(exerciseName: String) {
         self.exerciseName = exerciseName
@@ -217,10 +306,15 @@ final class UniversalExerciseAnalyzer {
             return AnalysisResult(reps: reps, feedback: guide.correction, isCorrection: false, assessable: false, holdSeconds: 0)
         }
         guard frame.assessable else {
-            // Wrong phone position / joints not visible IS a voice correction:
-            // the user cannot fix a position they are not told about.
-            return AnalysisResult(reps: reps, feedback: "Unable to assess — move so the required joints are visible.", isCorrection: true, assessable: false, holdSeconds: holdSeconds)
+            // Wrong phone position / joints not visible IS a voice correction,
+            // but only after it persists — see unassessableStreak above.
+            // The user cannot fix a position they are not told about, but a
+            // one-frame dropout is not a position error.
+            unassessableStreak += 1
+            let spoken = unassessableStreak >= 3
+            return AnalysisResult(reps: reps, feedback: "Unable to assess — move so the required joints are visible.", isCorrection: spoken, assessable: false, holdSeconds: holdSeconds)
         }
+        unassessableStreak = 0
         if guide.pattern == .bodyLineHold {
             guard let s = f_point(frame, "lShoulder"), let h = f_point(frame, "lHip"), let a = f_point(frame, "lAnkle") else {
                 return AnalysisResult(reps: reps, feedback: "Unable to assess", isCorrection: false, assessable: false, holdSeconds: holdSeconds)
@@ -277,27 +371,45 @@ final class UniversalExerciseAnalyzer {
             else { phase = "high" }
         }
         // Asymmetry check for elbow/knee/hip: left vs right angle differing a lot.
+        // Confidence gate (the bug in the gym video): the old code used the
+        // right-side points even when Vision was barely confident about them
+        // (dumbbell covering a wrist, an arm crossing the body, another person
+        // behind you), so a noisy right angle triggered "Keep both sides
+        // even" on almost every frame even when both sides were even.
+        // Now both right joints must be at least 0.3 confident, or no
+        // asymmetry correction is given at all.
         if guide.joint == "elbow" || guide.joint == "knee" || guide.joint == "hip" {
-            let left = jointAngle(frame, joint: guide.joint)
-            let right: Double? = {
-                if guide.joint == "elbow" {
-                    guard let s = frame.point("rShoulder"), let e = frame.point("rElbow"), let w = frame.point("rWrist") else { return nil }
-                    return Self.angle(a: s, b: e, c: w)
-                } else if guide.joint == "hip" {
-                    guard let s = frame.point("rShoulder"), let h = frame.point("rHip"), let k = frame.point("rKnee") else { return nil }
-                    return Self.angle(a: s, b: h, c: k)
-                } else {
-                    guard let h = frame.point("rHip"), let k = frame.point("rKnee"), let a = frame.point("rAnkle") else { return nil }
-                    return Self.angle(a: h, b: k, c: a)
-                }
+            let rightConfident: Bool = {
+                let keys: [String]
+                if guide.joint == "elbow" { keys = ["rShoulder", "rElbow", "rWrist"] }
+                else if guide.joint == "hip" { keys = ["rShoulder", "rHip", "rKnee"] }
+                else { keys = ["rHip", "rKnee", "rAnkle"] }
+                return keys.allSatisfy { (frame.point($0)?.confidence ?? 0) >= 0.3 }
             }()
-            if let l = left, let r = right, abs(l - r) > 25 {
-                return AnalysisResult(reps: reps, feedback: "Keep both sides even.", isCorrection: true, assessable: true, holdSeconds: 0)
+            if rightConfident {
+                let left = jointAngle(frame, joint: guide.joint)
+                let right: Double? = {
+                    if guide.joint == "elbow" {
+                        guard let s = frame.point("rShoulder"), let e = frame.point("rElbow"), let w = frame.point("rWrist") else { return nil }
+                        return Self.angle(a: s, b: e, c: w)
+                    } else if guide.joint == "hip" {
+                        guard let s = frame.point("rShoulder"), let h = frame.point("rHip"), let k = frame.point("rKnee") else { return nil }
+                        return Self.angle(a: s, b: h, c: k)
+                    } else {
+                        guard let h = frame.point("rHip"), let k = frame.point("rKnee"), let a = frame.point("rAnkle") else { return nil }
+                        return Self.angle(a: h, b: k, c: a)
+                    }
+                }()
+                if let l = left, let r = right, abs(l - r) > 25 {
+                    return AnalysisResult(reps: reps, feedback: "Keep both sides even.", isCorrection: true, assessable: true, holdSeconds: 0)
+                }
             }
         }
-        // Asymmetry for raises: one arm much higher than the other.
+        // Asymmetry for raises: one arm much higher than the other, with the
+        // same confidence gate on the right side.
         if guide.pattern == .armHeight {
             if let rs = frame.point("rShoulder"), let rw = frame.point("rWrist"),
+               rs.confidence >= 0.3, rw.confidence >= 0.3,
                abs(v - (rw.y - rs.y)) > 0.10 {
                 return AnalysisResult(reps: reps, feedback: "Keep both sides even.", isCorrection: true, assessable: true, holdSeconds: 0)
             }

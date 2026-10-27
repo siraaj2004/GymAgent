@@ -14,6 +14,38 @@ final class VoiceCoach: NSObject, ObservableObject, AVSpeechSynthesizerDelegate 
     private let synth = AVSpeechSynthesizer()
     private var lastSpoken: [String: Date] = [:]
     private var lastCorrection = Date.distantPast
+    private var beepPlayer: AVAudioPlayer?
+    private var lastBeep = Date.distantPast
+
+    /// Loud beep when the position is wrong. Deliberately NOT gated by
+    /// isMuted: mute silences the spoken coach, but the user asked for a
+    /// loud wrong-position alert, so a beep must still be heard. Throttled
+    /// to at most one beep every 2 seconds so it does not become a siren.
+    /// The tone is generated in code (880 Hz sine, 0.35 s, full volume) —
+    /// no audio file is needed.
+    func playWrongBeep() {
+        let now = Date()
+        guard now.timeIntervalSince(lastBeep) >= 2 else { return }
+        lastBeep = now
+        let sampleRate = 44100, duration = 0.35, freq = 880.0
+        let count = Int(Double(sampleRate) * duration)
+        var pcm = Data(capacity: count * 2)
+        for i in 0..<count {
+            let s = sin(2 * .pi * freq * Double(i) / Double(sampleRate))
+            var v = Int16(s * 28000)
+            pcm.append(Data(bytes: &v, count: 2))
+        }
+        var wav = Data()
+        func u32(_ v: UInt32) { var x = v.littleEndian; wav.append(Data(bytes: &x, count: 4)) }
+        func u16(_ v: UInt16) { var x = v.littleEndian; wav.append(Data(bytes: &x, count: 2)) }
+        wav.append("RIFF".data(using: .ascii)!); u32(UInt32(36 + pcm.count)); wav.append("WAVE".data(using: .ascii)!)
+        wav.append("fmt ".data(using: .ascii)!); u32(16); u16(1); u16(1); u32(UInt32(sampleRate)); u32(UInt32(sampleRate * 2)); u16(2); u16(16)
+        wav.append("data".data(using: .ascii)!); u32(UInt32(pcm.count)); wav.append(pcm)
+        guard let player = try? AVAudioPlayer(data: wav) else { return }
+        beepPlayer = player
+        player.volume = 1.0
+        player.play()
+    }
 
     override init() {
         super.init()
