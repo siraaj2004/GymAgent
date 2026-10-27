@@ -274,6 +274,16 @@ final class GymAITests: XCTestCase {
         XCTAssertTrue(third.isCorrection, "Persistent joints-not-visible must be a spoken correction")
     }
 
+    func testVideoFrameSamplerAndVerdict() {
+        XCTAssertEqual(VideoFrameSampler.interval(nominalFPS: 30), 3)
+        XCTAssertEqual(VideoFrameSampler.interval(nominalFPS: 60), 6)
+        XCTAssertEqual(VideoFrameSampler.interval(nominalFPS: 0), 1)
+        XCTAssertEqual(VideoFrameSampler.estimatedSamples(durationSeconds: 20), 200)
+        XCTAssertTrue(VideoFormVerdict.text(assessableShare: 0.2, correctionShare: 0.1).contains("out of frame"))
+        XCTAssertEqual(VideoFormVerdict.text(assessableShare: 0.9, correctionShare: 0.1), "Good form overall.")
+        XCTAssertTrue(VideoFormVerdict.text(assessableShare: 0.9, correctionShare: 0.8).contains("needs work"))
+    }
+
     func testSkeletonOverlayMapping() {
         let p = PosePoint(x: 0.25, y: 0.75, confidence: 1)
         let size = CGSize(width: 400, height: 800)
