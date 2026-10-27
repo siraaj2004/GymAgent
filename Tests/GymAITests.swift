@@ -236,6 +236,44 @@ final class GymAITests: XCTestCase {
         XCTAssertEqual(raise.feedback, "Keep both sides even.")
     }
 
+    func testCurlHasOwnCorrectionAndLowerThreshold() {
+        let curl = AllExerciseGuide.guide(for: "Incline DB curl")!
+        let press = AllExerciseGuide.guide(for: "Seated DB shoulder press")!
+        XCTAssertNotEqual(curl.correction, press.correction, "Curls must not speak the press correction")
+        XCTAssertTrue(curl.correction.contains("Curl smoothly"))
+        XCTAssertEqual(curl.low, 50, "Front-camera curls need a lower threshold than 70, or full curls look like half reps")
+    }
+
+    func testAsymmetryNeedsConfidentRightSide() {
+        // Left elbow ~160, right elbow ~90, but right wrist confidence 0.1:
+        // must NOT trigger "Keep both sides even" — that was the gym-video bug.
+        var pts: [String: PosePoint] = [:]
+        pts["lShoulder"] = PosePoint(x: 0, y: 1, confidence: 1)
+        pts["lElbow"] = PosePoint(x: 0, y: 0, confidence: 1)
+        pts["lWrist"] = PosePoint(x: 1, y: 0, confidence: 1)
+        pts["rShoulder"] = PosePoint(x: 0, y: 1, confidence: 1)
+        pts["rElbow"] = PosePoint(x: 0, y: 0, confidence: 1)
+        pts["rWrist"] = PosePoint(x: 0, y: 1, confidence: 0.1)
+        for name in ["lHip", "rHip", "lKnee", "rKnee"] {
+            pts[name] = PosePoint(x: 0.5, y: 0.5, confidence: 1)
+        }
+        let r = UniversalExerciseAnalyzer(exerciseName: "Incline DB curl")
+            .update(frame: PoseFrame(points: pts, required: ["lShoulder", "lElbow", "lWrist"]))
+        XCTAssertNotEqual(r.feedback, "Keep both sides even.")
+        XCTAssertFalse(r.isCorrection)
+    }
+
+    func testUnableToAssessDebouncedForVoice() {
+        let a = UniversalExerciseAnalyzer(exerciseName: "Incline DB curl")
+        let bad = PoseFrame(points: [:], required: ["lShoulder", "lElbow", "lWrist"])
+        let first = a.update(frame: bad)
+        let second = a.update(frame: bad)
+        let third = a.update(frame: bad)
+        XCTAssertFalse(first.isCorrection, "First dropped frame must not be a spoken correction")
+        XCTAssertFalse(second.isCorrection, "Second dropped frame must not be a spoken correction")
+        XCTAssertTrue(third.isCorrection, "Persistent joints-not-visible must be a spoken correction")
+    }
+
     func testCompactRepPanelTargetReps() {
         XCTAssertEqual(CoachTargetReps.target(from: "6-8"), 8)
         XCTAssertEqual(CoachTargetReps.target(from: "12-15"), 15)
