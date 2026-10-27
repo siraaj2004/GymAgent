@@ -3,22 +3,84 @@ import SwiftData
 import AVFoundation
 import Vision
 
+/// Form status for the compact rep panel. "Good" is never a safety claim:
+/// it only means the visible joints matched the rep pattern with no
+/// correction in the latest assessed frame.
+enum CoachFormStatus: Equatable {
+    case good, correction, stop, notDetected
+    var label: String {
+        switch self {
+        case .good: return "GOOD"
+        case .correction: return "CORRECTION"
+        case .stop: return "STOP"
+        case .notDetected: return "NOT DETECTED"
+        }
+    }
+    var color: Color {
+        switch self {
+        case .good: return GymTheme.accent
+        case .correction: return .yellow
+        case .stop: return .red
+        case .notDetected: return .gray
+        }
+    }
+    static func status(isRunning: Bool, assessable: Bool, isCorrection: Bool, feedback: String) -> CoachFormStatus {
+        if !assessable { return .notDetected }
+        let lower = feedback.lowercased()
+        if lower.contains("pain") { return .stop }
+        if !isRunning { return .notDetected }
+        if isCorrection { return .correction }
+        return .good
+    }
+}
+
+/// Target reps from the plan's reps string, e.g. "6-8" -> 8, "12-15" -> 15.
+/// Nil when the exercise has no plan entry, so the panel shows reps alone
+/// rather than inventing a target.
+enum CoachTargetReps {
+    static func target(from repsString: String) -> Int? {
+        repsString.components(separatedBy: CharacterSet.decimalDigits.inverted)
+            .compactMap(Int.init).max()
+    }
+}
+
 /// Live camera tab. Real AVFoundation + Vision pose request; skeleton overlay is
 /// drawn from the actual detected points. If points are missing, the UI says
 /// "Unable to assess" and no rep is counted. Touch controls are always available
 /// as a fallback for voice commands.
+///
+/// Compact UI (1.9.0): the camera fills the whole screen. Only a small
+/// translucent panel (~100-125 points tall, 92% of screen width) sits at the
+/// bottom, above the tab bar. The exercise name is a small top label, camera
+/// flip / mute are small top-right icons, and the long guidance + safety text
+/// lives behind an info button — nothing large and opaque covers the body.
 struct AICoachView: View {
     var exerciseName: String = "Back squat / hack squat"
     @EnvironmentObject private var coach: VoiceCoach
     @EnvironmentObject private var planStore: WorkoutPlanStore
+    @Environment(\.modelContext) private var context
     @Query private var profiles: [UserProfile]
     @State private var analyzer: UniversalExerciseAnalyzer?
     @State private var feedback = "Position your phone, then tap Start."
     @State private var reps = 0
     @State private var isRunning = false
     @State private var assessable = true
+    @State private var isCorrection = false
     @State private var cameraDenied = false
     @State private var useFrontCamera = true
+    @State private var showInfo = false
+    @State private var feedbackVisible = false
+    @State private var feedbackToken = 0
+    @State private var setAlreadySaved = false
+
+    private var targetReps: Int? {
+        planStore.plan.days.flatMap { $0.exercises }.first { $0.name == exerciseName }
+            .flatMap { CoachTargetReps.target(from: $0.reps) }
+    }
+    private var formStatus: CoachFormStatus {
+        CoachFormStatus.status(isRunning: isRunning, assessable: assessable, isCorrection: isCorrection, feedback: feedback)
+    }
+    private var language: String { profiles.first?.trainerLanguage ?? "English" }
 
     var body: some View {
         ZStack {
@@ -26,42 +88,145 @@ struct AICoachView: View {
             // a small 320-point box in the middle.
             CameraPreviewView(useFrontCamera: useFrontCamera, onFrame: handleFrame)
                 .ignoresSafeArea()
-            VStack(spacing: 12) {
-                VStack(spacing: 4) {
-                    Text(exerciseName).font(.headline)
-                    Text(PoseDetector.cameraGuidance(for: exerciseName)).font(.caption).foregroundColor(.white)
-                    if !assessable {
-                        Text("Unable to assess").padding().background(Color.black.opacity(0.7)).cornerRadius(10)
+            VStack(spacing: 10) {
+                // Small top label + top-right icons only. No large overlay.
+                HStack(alignment: .top) {
+                    Text(exerciseName)
+                        .font(.subheadline.weight(.semibold)).lineLimit(1)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(Color.black.opacity(0.45)).cornerRadius(12)
+                    Spacer()
+                    HStack(spacing: 8) {
+                        Button { showInfo = true } label: {
+                            Image(systemName: "info.circle.fill")
+                        }.accessibilityLabel("Exercise info")
+                        Button { useFrontCamera.toggle() } label: {
+                            Image(systemName: "camera.rotate.fill")
+                        }.accessibilityLabel(useFrontCamera ? "Switch to back camera" : "Switch to front camera")
+                        Button { coach.isMuted.toggle() } label: {
+                            Image(systemName: coach.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                        }.accessibilityLabel(coach.isMuted ? "Unmute voice" : "Mute voice")
                     }
-                }.padding().background(Color.black.opacity(0.55)).cornerRadius(12)
+                    .font(.title3)
+                    .buttonStyle(.plain)
+                    .foregroundColor(.white)
+                    .padding(4)
+                    .background(Color.black.opacity(0.45)).cornerRadius(22)
+                }
                 Spacer()
-                VStack(spacing: 10) {
-                    Text("Reps: \(reps)").font(.system(size: 48, weight: .bold)).foregroundColor(GymTheme.accent)
-                    Text(feedback).multilineTextAlignment(.center)
-                    // Honest per-exercise limits: what the camera checks, and what it cannot check.
-                    if let guide = analyzer?.guide {
-                        Text("Camera checks: \(guide.checks)").font(.caption).foregroundColor(.white).multilineTextAlignment(.center)
-                        Text("Camera cannot check: \(guide.cannotCheck)").font(.caption).foregroundColor(.yellow).multilineTextAlignment(.center)
-                    }
+                // Short floating feedback, fading after a few seconds so the
+                // body stays visible. Tracking never stops when it fades.
+                if feedbackVisible {
+                    Text(feedback)
+                        .font(.subheadline).multilineTextAlignment(.center).lineLimit(2)
+                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .background(Color.black.opacity(0.55)).cornerRadius(12)
+                        .transition(.opacity)
+                }
+                if cameraDenied {
+                    Text("Camera permission was denied. Allow Camera in iPhone Settings > GYM AI, or use manual counting.")
+                        .font(.caption).foregroundColor(.red).multilineTextAlignment(.center)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(Color.black.opacity(0.55)).cornerRadius(12)
+                }
+                // Compact bottom panel: ~92% wide (16pt margins each side),
+                // about 100-125 points tall, blurred dark translucent.
+                VStack(spacing: 8) {
                     HStack {
-                        Button(isRunning ? "Pause" : "Start camera") { isRunning.toggle() }
-                        Button("+1 rep by hand") { reps += 1 }
-                        Button("Finish") { isRunning = false; coach.stop() }
-                    }.buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
-                    Button(useFrontCamera ? "Switch to back camera" : "Switch to front camera") { useFrontCamera.toggle() }
-                        .buttonStyle(.bordered).tint(GymTheme.accent).controlSize(.large)
-                    HStack {
-                        Toggle("Mute voice", isOn: $coach.isMuted)
-                        Button("How many reps?") { coach.speak("You have done \(reps) repetitions.", language: profiles.first?.trainerLanguage ?? "English") }
+                        Button { coach.speak("You have done \(reps) repetitions.", language: language) } label: {
+                            HStack(spacing: 4) {
+                                Text("REPS").font(.caption.weight(.semibold)).foregroundColor(.white.opacity(0.8))
+                                if let target = targetReps {
+                                    Text("\(reps) / \(target)").font(.title3.weight(.bold)).foregroundColor(GymTheme.accent)
+                                } else {
+                                    Text("\(reps)").font(.title3.weight(.bold)).foregroundColor(GymTheme.accent)
+                                }
+                            }
+                        }.accessibilityLabel("How many reps?")
+                        Spacer()
+                        HStack(spacing: 5) {
+                            Circle().fill(formStatus.color).frame(width: 8, height: 8)
+                            Text("FORM: \(formStatus.label)").font(.caption.weight(.bold)).foregroundColor(formStatus.color)
+                        }
                     }
-                    Text("Safety: camera analysis cannot detect every error. A movement is never called safe just because no error was detected. For heavy lifts, feedback is conservative. Stop for sharp pain, dizziness or numbness.")
-                        .font(.caption).foregroundColor(.white)
-                    if cameraDenied { Text("Camera permission was denied. Allow Camera in iPhone Settings > GYM AI, or use manual counting.").foregroundColor(.red) }
-                }.padding().background(Color.black.opacity(0.55)).cornerRadius(16)
-            }.padding()
+                    HStack(spacing: 8) {
+                        Button(isRunning ? "Pause" : "Start") {
+                            isRunning.toggle()
+                            if isRunning { setAlreadySaved = false }
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        Button("+1 Rep") {
+                            reps += 1
+                            setAlreadySaved = false
+                            feedback = "Manual rep added."
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        Button("Finish") { finishSet() }
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .disabled(!isRunning && reps == 0)
+                    }
+                    .font(.subheadline.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.9)
+                    .buttonStyle(.borderedProminent).tint(GymTheme.accent).controlSize(.large)
+                }
+                .padding(12)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+                .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.12), lineWidth: 1))
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+            .padding(.top, 8)
         }
         .onAppear { analyzer = UniversalExerciseAnalyzer(exerciseName: exerciseName) }
         .onChange(of: exerciseName) { analyzer = UniversalExerciseAnalyzer(exerciseName: $0) }
+        .onChange(of: feedback) { _, _ in
+            // Show the new message, then fade it after 3 seconds.
+            feedbackVisible = true
+            feedbackToken += 1
+            let token = feedbackToken
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                if token == feedbackToken { withAnimation { feedbackVisible = false } }
+            }
+        }
+        .sheet(isPresented: $showInfo) {
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(exerciseName).font(.title3.weight(.bold))
+                        Text(PoseDetector.cameraGuidance(for: exerciseName))
+                        if let guide = analyzer?.guide {
+                            Text("Camera checks: \(guide.checks)")
+                            Text("Camera cannot check: \(guide.cannotCheck)").foregroundColor(.yellow)
+                        }
+                        Text("Safety: camera analysis cannot detect every error. A movement is never called safe just because no error was detected. For heavy lifts, feedback is conservative. Stop for sharp pain, dizziness or numbness.")
+                        Button("How many reps?") { coach.speak("You have done \(reps) repetitions.", language: language) }
+                            .buttonStyle(.borderedProminent).tint(GymTheme.accent)
+                    }.padding()
+                }
+                .toolbar { Button("Done") { showInfo = false } }
+            }
+        }
+    }
+
+    /// Finish ends the set and saves it (once per set) to SwiftData, so the
+    /// set appears in Progress like any other saved set.
+    private func finishSet() {
+        if reps > 0, !setAlreadySaved {
+            let session = WorkoutSessionRecord()
+            session.dayNumber = planStore.today()?.day ?? 1
+            session.dayTitle = planStore.today()?.title ?? ""
+            session.endedAt = Date()
+            let record = SetRecord()
+            record.exerciseName = exerciseName
+            record.setIndex = 1
+            record.reps = reps
+            session.sets.append(record)
+            context.insert(session)
+            try? context.save()
+            setAlreadySaved = true
+            feedback = "Set saved: \(reps) reps."
+        }
+        isRunning = false
+        coach.stop()
     }
 
     private func handleFrame(_ observation: VNHumanBodyPoseObservation) {
@@ -81,9 +246,14 @@ struct AICoachView: View {
         let frame = PoseDetector.frame(from: observation, required: required)
         let result = analyzer.update(frame: frame)
         DispatchQueue.main.async {
+            let increased = result.reps > self.reps
             self.reps = result.reps; self.feedback = result.feedback; self.assessable = result.assessable
+            self.isCorrection = result.isCorrection
             let language = self.profiles.first?.trainerLanguage ?? "English"
             if result.isCorrection { coach.speakCorrection(result.feedback, language: language) }
+            else if increased, let target = self.targetReps, result.reps >= target {
+                coach.speakCorrection("Set complete.", language: language)
+            }
             else if result.feedback == "Good repetition!" { coach.speakCorrection("Good repetition!", language: language) }
         }
     }
