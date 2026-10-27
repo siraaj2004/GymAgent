@@ -44,6 +44,75 @@ enum CoachTargetReps {
     }
 }
 
+/// Maps a Vision pose point to a screen point for the skeleton overlay.
+/// Vision y grows upward, screen y grows downward, so y is flipped.
+/// The front camera preview is mirrored, so x is flipped for the front camera.
+/// This is an approximation under resizeAspectFill: the camera and the screen
+/// have similar portrait ratios, so alignment is close, not pixel-perfect.
+enum SkeletonPointMapper {
+    static func position(for point: PosePoint, size: CGSize, mirrored: Bool) -> CGPoint {
+        let x = (mirrored ? 1 - point.x : point.x) * size.width
+        let y = (1 - point.y) * size.height
+        return CGPoint(x: x, y: y)
+    }
+}
+
+/// Skeleton overlay: dots + lines for the joints Vision actually detected,
+/// drawn on top of the camera preview. Only detected joints are drawn — a
+/// joint with no point is simply absent, never guessed.
+/// Colour shows FORM, as asked: green when the form is correct, red when
+/// the form is wrong (a correction is active). A joint Vision is not
+/// confident about (< 0.3) stays grey, whatever the form — it is not
+/// claimed as correct or wrong.
+struct SkeletonOverlayView: View {
+    var points: [String: PosePoint]
+    var size: CGSize
+    var mirrored: Bool
+    var isWrong: Bool
+    var assessable: Bool
+    private static let connections: [(String, String)] = [
+        ("lShoulder", "rShoulder"), ("lShoulder", "lElbow"), ("lElbow", "lWrist"),
+        ("rShoulder", "rElbow"), ("rElbow", "rWrist"),
+        ("lShoulder", "lHip"), ("rShoulder", "rHip"), ("lHip", "rHip"),
+        ("lHip", "lKnee"), ("lKnee", "lAnkle"),
+        ("rHip", "rKnee"), ("rKnee", "rAnkle"),
+    ]
+    private func pos(_ name: String) -> CGPoint? {
+        guard let p = points[name], p.confidence > 0 else { return nil }
+        return SkeletonPointMapper.position(for: p, size: size, mirrored: mirrored)
+    }
+    private func color(for point: PosePoint) -> Color {
+        if point.confidence < 0.3 { return .gray }
+        if !assessable { return .gray }
+        if isWrong { return .red }
+        return GymTheme.accent
+    }
+    private var lineColor: Color {
+        if !assessable { return Color.gray.opacity(0.5) }
+        return isWrong ? .red : GymTheme.accent
+    }
+    var body: some View {
+        ZStack {
+            Path { path in
+                for (a, b) in Self.connections {
+                    if let pa = pos(a), let pb = pos(b),
+                       (points[a]?.confidence ?? 0) >= 0.3, (points[b]?.confidence ?? 0) >= 0.3 {
+                        path.move(to: pa); path.addLine(to: pb)
+                    }
+                }
+            }.stroke(lineColor.opacity(0.8), lineWidth: 2)
+            ForEach(Array(points.keys.sorted()), id: \.self) { name in
+                if let p = points[name], p.confidence > 0 {
+                    let c = SkeletonPointMapper.position(for: p, size: size, mirrored: mirrored)
+                    Circle().fill(color(for: p)).frame(width: 12, height: 12)
+                        .overlay(Circle().stroke(Color.white, lineWidth: 1))
+                        .position(c)
+                }
+            }
+        }
+    }
+}
+
 /// Live camera tab. Real AVFoundation + Vision pose request; skeleton overlay is
 /// drawn from the actual detected points. If points are missing, the UI says
 /// "Unable to assess" and no rep is counted. Touch controls are always available
@@ -76,6 +145,10 @@ struct AICoachView: View {
     // up to 3 consecutive unassessable frames, so a brief occlusion does not
     // flicker the screen between GOOD / NOT DETECTED / CORRECTION.
     @State private var unassessableStreak = 0
+    // Latest Vision pose points, for the skeleton overlay. Updated on every
+    // camera frame, even before Start is tapped, so joints show as soon as
+    // they come on screen.
+    @State private var posePoints: [String: PosePoint] = [:]
 
     private var targetReps: Int? {
         planStore.plan.days.flatMap { $0.exercises }.first { $0.name == exerciseName }
@@ -92,6 +165,11 @@ struct AICoachView: View {
             // a small 320-point box in the middle.
             CameraPreviewView(useFrontCamera: useFrontCamera, onFrame: handleFrame)
                 .ignoresSafeArea()
+            // Skeleton overlay, above the camera but below the panels:
+            // green joints = correct form, red joints = wrong form.
+            GeometryReader { geo in
+                SkeletonOverlayView(points: posePoints, size: geo.size, mirrored: useFrontCamera, isWrong: isCorrection, assessable: assessable)
+            }.ignoresSafeArea()
             VStack(spacing: 10) {
                 // Small top label + top-right icons only. No large overlay.
                 HStack(alignment: .top) {
@@ -234,7 +312,7 @@ struct AICoachView: View {
     }
 
     private func handleFrame(_ observation: VNHumanBodyPoseObservation) {
-        guard isRunning, let analyzer else { return }
+        guard let analyzer else { return }
         let guide = analyzer.guide
         var required: [String] = ["lShoulder", "lHip", "lAnkle"]
         if let guide {
@@ -248,6 +326,12 @@ struct AICoachView: View {
             else if guide.pattern == .bodyLineHold { required = ["lShoulder", "lHip", "lAnkle"] }
         }
         let frame = PoseDetector.frame(from: observation, required: required)
+        // Skeleton overlay first: joints show as soon as they come on
+        // screen, even before Start. Rep counting and corrections still
+        // only run while tracking is on.
+        let overlayPoints = frame.points
+        DispatchQueue.main.async { self.posePoints = overlayPoints }
+        guard isRunning else { return }
         let result = analyzer.update(frame: frame)
         DispatchQueue.main.async {
             let increased = result.reps > self.reps
